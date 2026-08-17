@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dsh-std.example/schemas/negotiation-report/v0.15.json",
+  "$comment": "骨架占位（P0），随 spec/negotiation.md 撰写时补全。$id 为示意，以 Registry 定案为准。字段语义以 spec/negotiation.md 为唯一权威来源。三种结局（compatible / rejected / pending-authorization）的示例必须齐全。",
+  "title": "Negotiation Report",
+  "type": "object",
+  "required": ["verdict"],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["compatible", "rejected", "pending-authorization"]
+    }
+  }
+}

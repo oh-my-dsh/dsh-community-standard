@@ -1,0 +1,15 @@
+{
+  "$comment": "骨架占位（P0）。坐标与 schema id 均为示意，以 Registry 定案为准；schemaHash 待 schema 冻结后填入不可变 hash。条目字段定义见 registry/README.md。",
+  "apiVersion": "commands.dsh/v1alpha1",
+  "kind": "Command",
+  "status": "Draft",
+  "owningSpec": "spec/manifest.md",
+  "owningRFC": "rfcs/0001-core-contract.md",
+  "schema": {
+    "id": "https://dsh-std.example/schemas/commands.dsh/v1alpha1.json",
+    "hash": null
+  },
+  "sensitivity": "low",
+  "lifecycleScope": "activation",
+  "deprecation": null
+}

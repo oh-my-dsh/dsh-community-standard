@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dsh-std.example/schemas/host-descriptor/v0.15.json",
+  "$comment": "骨架占位（P0），随 spec/host-descriptor.md 撰写时补全。$id 为示意，以 Registry 定案为准。字段语义以 spec/host-descriptor.md 为唯一权威来源。",
+  "title": "Host Descriptor",
+  "type": "object",
+  "required": ["descriptorVersion", "id", "capabilities"],
+  "properties": {
+    "descriptorVersion": { "type": "string" },
+    "id": { "type": "string" },
+    "apiVersions": { "type": "object" },
+    "execution": { "type": "object" },
+    "capabilities": { "type": "array" },
+    "platforms": { "type": "array" }
+  }
+}

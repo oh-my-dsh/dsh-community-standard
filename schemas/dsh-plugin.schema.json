@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dsh-std.example/schemas/dsh-plugin/v0.15.json",
+  "$comment": "骨架占位（P0），随 spec/manifest.md 撰写时补全。$id 为示意，以 Registry 定案为准。字段语义以 spec/manifest.md 为唯一权威来源，本文件不得出现 spec 未定义的规则。",
+  "title": "dsh-plugin.json",
+  "type": "object",
+  "required": ["$schema", "id", "name", "version", "manifestVersion", "facets"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "version": { "type": "string" },
+    "manifestVersion": { "type": "string" },
+    "facets": { "type": "object" },
+    "requires": { "type": "object" },
+    "permissions": { "type": "array" },
+    "contributes": { "type": "object" },
+    "subscriptions": { "type": "array" }
+  }
+}
