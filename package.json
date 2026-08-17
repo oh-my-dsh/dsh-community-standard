@@ -1,0 +1,14 @@
+{
+  "name": "dsh-community-standard",
+  "private": true,
+  "type": "module",
+  "description": "dsh 插件生态的社区互操作标准（社区 Draft，非官方）",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}
