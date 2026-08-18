@@ -1,14 +1,67 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://dsh-std.example/schemas/negotiation-report/v0.15.json",
-  "$comment": "骨架占位（P0），随 spec/negotiation.md 撰写时补全。$id 为示意，以 Registry 定案为准。字段语义以 spec/negotiation.md 为唯一权威来源。三种结局（compatible / rejected / pending-authorization）的示例必须齐全。",
+  "$comment": "字段语义以 spec/negotiation.md 为唯一权威来源。$id 为示意，以 Registry 定案为准。三种结局（compatible / rejected / pending-authorization）的示例见 spec/negotiation.md §4。",
   "title": "Negotiation Report",
   "type": "object",
-  "required": ["verdict"],
+  "additionalProperties": false,
+  "required": ["reportVersion", "verdict", "message"],
   "properties": {
+    "reportVersion": {
+      "const": "0.15",
+      "description": "报告格式版本。"
+    },
     "verdict": {
       "type": "string",
       "enum": ["compatible", "rejected", "pending-authorization"]
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "人话结论；rejected 时必须包含用户能看懂的拒载原因（需要什么、当前环境缺什么），不得只输出坐标串。"
+    },
+    "missingRequired": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/coordinate" },
+      "description": "缺失的 required 契约坐标；rejected 时列出。"
+    },
+    "degradedOptional": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/coordinate" },
+      "description": "缺失的 optional 契约坐标（降级项）；compatible 时可能非空。"
+    },
+    "awaitingAuthorization": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/coordinate" },
+      "description": "匹配成功但待用户/策略授权的敏感声明坐标；pending-authorization 时列出。"
+    },
+    "unsupportedFacets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["facet", "requiredApiVersion", "supportedApiVersions"],
+        "properties": {
+          "facet": { "type": "string", "minLength": 1 },
+          "requiredApiVersion": { "type": "string", "minLength": 1 },
+          "supportedApiVersions": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "description": "facet API 版本不匹配项。"
+    }
+  },
+  "definitions": {
+    "coordinate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "kind"],
+      "properties": {
+        "apiVersion": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "minLength": 1 }
+      }
     }
   }
 }

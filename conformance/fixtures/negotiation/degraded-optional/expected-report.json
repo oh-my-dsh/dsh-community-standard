@@ -1,0 +1,8 @@
+{
+  "reportVersion": "0.15",
+  "verdict": "compatible",
+  "message": "静态协商通过；可选的消息观察能力不可用，插件将按声明的降级路径运行。",
+  "degradedOptional": [
+    { "apiVersion": "messages.dsh/v1alpha1", "kind": "MessageObserver" }
+  ]
+}

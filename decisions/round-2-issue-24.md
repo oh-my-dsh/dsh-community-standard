@@ -17,3 +17,5 @@
 | RFC 0003（插件间 service 组合）保持下一阶段最高优先级（Qiuner） | **已采纳** | Phase 3 即启动评审；provider cardinality、选择、冲突计划、健康与替换为其必答题（[RFC 0003](../rfcs/0003-service-composition.md)） |
 | 反复强调参考实现不是标准（Qiuner） | **已采纳** | 从验收标准提升为原则 ⑧ |
 | TUI 认领第一批标准兼容宿主与测试（T-Auto） | **已采纳** | v0.15 §4.4 验收证据；Phase 2（[spec/conformance.md](../spec/conformance.md)） |
+
+> **表注**：Issue #24 实际共 5 条评论，本表 7 行——Yan-Zero 的一条评论含两点建议（元协议内核、Facet 分面），Qiuner 的一条评论含三点建议（RFC 0003 优先级、URL query 归属、参考实现定位），均按建议逐条拆分登记。

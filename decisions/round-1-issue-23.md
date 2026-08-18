@@ -25,4 +25,4 @@
 | page → layer → slot → component 统一 UI 服务（r05En1cU / Lipraty） | 独立 RFC | 跨端声明式 UI 整体延期；vnode / adapter 证据供 UI RFC 参考 |
 | 多 Panel Web UI 的 URL state（morlay，首轮） | 不属可移植核心 | 归 Web Presentation capability（v0.15 处置见 [round-2](round-2-issue-24.md)） |
 
-原始逐条处置记录（含评论原文引述）见 [research/community-issue-23-review.md](../research/community-issue-23-review.md)（待迁移）。
+原始逐条处置记录（含评论原文引述）见 [research/community-issue-23-review.md](../research/community-issue-23-review.md)。

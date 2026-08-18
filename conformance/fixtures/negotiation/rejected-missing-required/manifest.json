@@ -1,0 +1,15 @@
+{
+  "$schema": "https://dsh-std.example/schemas/dsh-plugin/v0.15.json",
+  "id": "com.example.gui-panel",
+  "name": "GUI Panel Plugin",
+  "version": "0.3.0",
+  "manifestVersion": "0.15",
+  "facets": {
+    "host": { "entry": "dist/host.js", "apiVersion": "v1alpha1" }
+  },
+  "requires": {
+    "contracts": [
+      { "apiVersion": "x-org.example.gui.panel/v1alpha1", "kind": "Panel" }
+    ]
+  }
+}

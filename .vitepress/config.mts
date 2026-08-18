@@ -8,8 +8,8 @@ export default defineConfig({
   description: 'dsh 插件生态的社区互操作标准（社区 Draft v0.15，非官方）',
   cleanUrls: true,
   lastUpdated: true,
-  // 仓库处于骨架阶段，部分文档互链指向待撰写的文件；骨架填完后改为 false 让死链炸构建
-  ignoreDeadLinks: true,
+  // 文档已全部成稿：死链直接让构建失败
+  ignoreDeadLinks: false,
   srcExclude: ['.github/**', '.vitepress/**', 'node_modules/**'],
 
   // 让各目录的 README.md 成为该目录的首页
@@ -94,6 +94,7 @@ export default defineConfig({
           { text: '插件需求调研', link: '/research/dsh-plugin-needs' },
           { text: '成熟框架调研', link: '/research/mature-plugin-frameworks' },
           { text: 'VS Code 扩展模型', link: '/research/vscode-extension-model' },
+          { text: 'issue #23 评论存档', link: '/research/community-issue-23-review' },
         ],
       },
       {

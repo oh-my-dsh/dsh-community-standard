@@ -1,0 +1,17 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/lifecycle.md §2.4。",
+  "scenario": "duplicate-activation",
+  "spec": "spec/lifecycle.md §2.4",
+  "rule": "HMR / profile 重组下的重复激活必须创建新的 activation identity（新 activationId）；旧 activation 的 effect 全部 release 或转交。",
+  "steps": [
+    { "action": "host.startup", "until": "ready" },
+    { "action": "plugin.activate", "plugin": "com.example.alpha", "note": "记录 activationId 为 A1" },
+    { "action": "host.hot-reload", "plugin": "com.example.alpha", "note": "触发重复激活：先 dispose A1，再 activate" },
+    { "action": "plugin.activate", "plugin": "com.example.alpha", "note": "记录 activationId 为 A2" }
+  ],
+  "expect": [
+    "A1 与 A2 是不同的 activationId",
+    "A1 名下的 effect 在 A2 激活前全部 release 或显式转交（ledger 可查）",
+    "当前资源归属指向 A2，A1 的历史归属记录继续可查"
+  ]
+}

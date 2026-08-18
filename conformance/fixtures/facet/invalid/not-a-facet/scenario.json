@@ -1,0 +1,16 @@
+{
+  "$comment": "package inspection 类 fixture：entry.js 是被检查的插件入口，由 conformance suites 做模块加载/静态检查后断言 expect。对应 spec/facet-model.md §2.2 第 2 条与 §4。",
+  "scenario": "not-a-facet",
+  "spec": "spec/facet-model.md §2.2 / §4",
+  "rule": "entry 模块必须以默认导出给出一个由 defineFacet 创建的 facet 定义（export default defineFacet(activation => ...)）。",
+  "input": "entry.js",
+  "steps": [
+    { "action": "package.load-entry", "entry": "entry.js" },
+    { "action": "package.inspect-default-export" }
+  ],
+  "expect": [
+    "validate 阶段失败：默认导出不是 defineFacet 创建的 facet 定义",
+    "宿主给出人话报错（说明期望的默认导出形态）",
+    "插件不进入 activating"
+  ]
+}

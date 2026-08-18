@@ -1,0 +1,17 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/lifecycle.md §2.3 与 §4。",
+  "scenario": "crash-no-deactivate",
+  "spec": "spec/lifecycle.md §2.3 / §4",
+  "rule": "进程崩溃、断电或强制终止时，宿主不保证 deactivate 送达；重启后恢复扫描必须如实报告 orphaned / unknown，不得伪造清理成功。",
+  "steps": [
+    { "action": "host.startup", "until": "ready" },
+    { "action": "plugin.activate", "plugin": "com.example.alpha", "note": "激活后创建若干带持久 resource marker 的 effect" },
+    { "action": "host.kill", "signal": "SIGKILL", "note": "模拟崩溃：deactivate 不会送达" },
+    { "action": "host.startup", "until": "ready" }
+  ],
+  "expect": [
+    "崩溃前 activation 的 effect 没有被标记为已 release",
+    "重启后恢复扫描对比持久 resource marker 与最后 durable ledger，将残留资源报告为 orphaned 或 unknown",
+    "报告中不得出现伪造的清理成功记录（release / ok）"
+  ]
+}

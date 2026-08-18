@@ -46,23 +46,23 @@ dsh 生态已经有 3,800+ 个插件仓库，但底下有三条裂缝：
 - **我只有五分钟** → 读 [rfcs/0001-core-contract.md](rfcs/0001-core-contract.md) 的 §0 和 §9
 - **我是插件作者** → [guides/plugin-author.md](guides/plugin-author.md) → [spec/manifest.md](spec/manifest.md) → [registry/](registry/)
 - **我是宿主 / 终端维护者** → [guides/host-maintainer.md](guides/host-maintainer.md) → [spec/host-descriptor.md](spec/host-descriptor.md) → [spec/negotiation.md](spec/negotiation.md)
-- **我想参与标准制定** → [rfcs/0000-governance.md](rfcs/0000-governance.md) → [rfcs/template.md](rfcs/template.md) → [decisions/](decisions/)
+- **我想参与标准制定** → [rfcs/0000-governance.md](rfcs/0000-governance.md) → [rfcs/template.md](rfcs/template.md) → `decisions/` 处置记录
 - **我是 dsh 官方** → rfcs/0001 的 §7（我们不请求什么 / 请求什么 / 对官方的价值）和 §9（本轮五个问题）
 
 ## 当前状态
 
-仓库处于**搭骨架阶段**：README 与两份 decisions 处置记录是成稿，其余大部分是带写作提纲的占位稿——每份文件头部标了优先级（P0–P3）、状态和计划内容。
+仓库已**全部成稿（社区 Draft v0.15）**：rfcs/、spec/、guides/、registry/、research/、decisions/ 均为完整 Draft；schemas/ 三份 JSON Schema 与 conformance/fixtures/ 已随 spec 落地，conformance/suites/ 一致性测试套件待 Phase 2 实现期产出。
 
-首批共 22 份文档，分四个优先级（完整规划见 [docs-plan.md](docs-plan.md)）：
+首批共 23 份文档，分四个优先级（完整规划见 [docs-plan.md](docs-plan.md)）：
 
 - **P0（8 份）**：v0.15 冻结前必须完成——缺一份，标准就没法被实现和验证
-- **P1（6 份）**：v0.15 发布时应当就位
-- **P2（5 份）**：延期主题的 Draft，从 fabric 仓库迁移
-- **P3（3 份）**：调研与背景材料，直接迁移
+- **P1（7 份）**：v0.15 发布时应当就位
+- **P2（4 份）**：延期主题的 Draft，从 fabric 仓库迁移
+- **P3（4 份）**：调研与背景材料，直接迁移
 
 ## 参与方式
 
-- **提意见 / 讨论**：到 [omdsh-dev/community](https://github.com/omdsh-dev/community) 开 issue 或参与讨论。新评论不会静默改写 Draft：变更先过审查，再更新 [decisions/](decisions/) 处置记录。
+- **提意见 / 讨论**：到 [omdsh-dev/community](https://github.com/omdsh-dev/community) 开 issue 或参与讨论。新评论不会静默改写 Draft：变更先过审查，再更新 `decisions/` 处置记录。
 - **认领写作**：按 [docs-plan.md](docs-plan.md) 第 7 节的顺序挑 P0/P1 文档，提 PR 即可。
 - **三条写作纪律**（也贴在 PR 模板里）：
   1. **规范只写一遍**：同一条规则出现在两个文件里，第二处必须是链接。
@@ -71,4 +71,4 @@ dsh 生态已经有 3,800+ 个插件仓库，但底下有三条裂缝：
 
 ## License
 
-[MIT](LICENSE)
+MIT（见仓库根目录 `LICENSE` 文件）

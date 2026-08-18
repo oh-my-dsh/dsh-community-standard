@@ -1,0 +1,18 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/lifecycle.md §2.3 与 §2.6。",
+  "scenario": "graceful-shutdown",
+  "spec": "spec/lifecycle.md §2.3 / §2.6",
+  "rule": "正常关闭（宿主进入 stopping）时，宿主必须对每个 active 插件执行 best-effort deactivate：停止接收新调用、在明确时间边界内 abort 并 drain、按契约顺序释放 effect；清理失败记 cleanup-failed，不阻塞整体到达 disposed。",
+  "steps": [
+    { "action": "host.startup", "until": "ready" },
+    { "action": "plugin.activate", "plugin": "com.example.alpha" },
+    { "action": "plugin.activate", "plugin": "com.example.beta", "note": "beta 的某个清理函数被设计为抛异常" },
+    { "action": "host.shutdown", "mode": "graceful" }
+  ],
+  "expect": [
+    "两个插件都收到 deactivate 调用",
+    "每个 activation 最终到达 disposed（deactivating → disposed）",
+    "beta 抛异常的清理项在 ledger 中记为 cleanup-failed，其余 effect 正常 release",
+    "beta 的清理失败不阻塞 alpha 的停用，也不阻塞宿主进入 stopped"
+  ]
+}

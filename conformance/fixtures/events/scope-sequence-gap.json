@@ -1,0 +1,17 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/event-envelope.md §2.1 与 §2.2。",
+  "scenario": "scope-sequence-gap",
+  "spec": "spec/event-envelope.md §2.1 / §2.2",
+  "rule": "scopeSequence 在同一 scopeType + scopeId 内必须单调递增、不得重复；宿主必须保证同一 scope 内的投递顺序与 scopeSequence 一致；检出乱序后不得静默重排。",
+  "steps": [
+    { "action": "envelope.deliver", "scope": "session/sess_A", "scopeSequence": 1 },
+    { "action": "envelope.deliver", "scope": "session/sess_A", "scopeSequence": 3, "note": "跳号" },
+    { "action": "envelope.deliver", "scope": "session/sess_A", "scopeSequence": 3, "note": "重复序号" },
+    { "action": "envelope.deliver", "scope": "session/sess_A", "scopeSequence": 2, "note": "乱序（比已投递的最大值小）" }
+  ],
+  "expect": [
+    "跳号、重复、乱序均被检出并记录",
+    "宿主可以丢弃该事件或对该 scope 标记降级，但不得静默重排后按 1,2,3,3 投递",
+    "同一 scope 内正常投递的事件顺序与 scopeSequence 一致"
+  ]
+}

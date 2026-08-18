@@ -1,20 +1,107 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://dsh-std.example/schemas/dsh-plugin/v0.15.json",
-  "$comment": "骨架占位（P0），随 spec/manifest.md 撰写时补全。$id 为示意，以 Registry 定案为准。字段语义以 spec/manifest.md 为唯一权威来源，本文件不得出现 spec 未定义的规则。",
+  "$comment": "字段语义以 spec/manifest.md 为唯一权威来源，本文件不得出现 spec 未定义的规则。$id 为示意，以 Registry 定案为准。",
   "title": "dsh-plugin.json",
   "type": "object",
+  "additionalProperties": false,
   "required": ["$schema", "id", "name", "version", "manifestVersion", "facets"],
   "properties": {
-    "$schema": { "type": "string" },
-    "id": { "type": "string" },
-    "name": { "type": "string" },
-    "version": { "type": "string" },
-    "manifestVersion": { "type": "string" },
-    "facets": { "type": "object" },
-    "requires": { "type": "object" },
-    "permissions": { "type": "array" },
-    "contributes": { "type": "object" },
-    "subscriptions": { "type": "array" }
+    "$schema": {
+      "type": "string",
+      "minLength": 1,
+      "description": "canonical schema identifier；宿主据此选择本地 schema，不从网络获取。"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$",
+      "description": "插件全局唯一 ID，小写反向域名语法，至少两段。"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$",
+      "description": "插件自身的 SemVer 版本。"
+    },
+    "manifestVersion": {
+      "const": "0.15",
+      "description": "必须与 $schema 选中的 schema 版本一致，不能成为另一个协商轴。"
+    },
+    "facets": {
+      "type": "object",
+      "required": ["host"],
+      "propertyNames": { "not": { "enum": ["client", "worker"] } },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry", "apiVersion"],
+        "properties": {
+          "entry": {
+            "type": "string",
+            "minLength": 1,
+            "description": "入口文件，必须位于 package 根目录内。"
+          },
+          "apiVersion": {
+            "type": "string",
+            "minLength": 1,
+            "description": "该 facet 要求的 Host API 版本。"
+          }
+        }
+      },
+      "description": "v0.15 必须包含 host facet；client / worker 为保留名（归 RFC 0002），出现即拒绝。"
+    },
+    "requires": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contracts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["apiVersion", "kind"],
+            "properties": {
+              "apiVersion": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "minLength": 1 },
+              "optional": { "type": "boolean", "default": false }
+            }
+          }
+        }
+      },
+      "description": "v0.15 只接受 requires.contracts；requires.services 被拒绝（归 RFC 0003）。"
+    },
+    "permissions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "契约坐标之外的敏感 scope；v0.15 尚未标准化任何独立 scope，通常为空数组。"
+    },
+    "contributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "全局唯一，应该以插件 id 为前缀。"
+              },
+              "title": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      },
+      "description": "v0.15 只定义 contributes.commands。"
+    },
+    "subscriptions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "事件标识符数组；控制事件投递，不是激活触发器。"
+    }
   }
 }

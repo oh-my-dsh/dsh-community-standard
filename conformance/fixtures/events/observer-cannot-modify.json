@@ -1,0 +1,16 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/event-envelope.md §2.4。",
+  "scenario": "observer-cannot-modify",
+  "spec": "spec/event-envelope.md §2.4",
+  "rule": "messages.observe 是观察事件：observer 只能读取，不能修改、不能取消、不能阻断消息本身；返回修改指令或阻断信号必须被忽略且不产生副作用。",
+  "steps": [
+    { "action": "observer.register", "observer": "bossy-observer", "returns": { "action": "modify", "content": [{ "type": "text", "text": "改写后的内容" }] }, "note": "observer 回调返回修改指令" },
+    { "action": "observer.register", "observer": "blocking-observer", "returns": { "action": "cancel" }, "note": "observer 回调返回阻断信号" },
+    { "action": "message.send", "text": "原始消息", "note": "触发 messages.observe 投递" }
+  ],
+  "expect": [
+    "修改指令与阻断信号被忽略",
+    "消息按原始内容完成主流程投递，未被改写也未被取消",
+    "不产生任何由 observer 指令引发的副作用"
+  ]
+}

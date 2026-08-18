@@ -1,0 +1,8 @@
+{
+  "reportVersion": "0.15",
+  "verdict": "rejected",
+  "message": "该插件需要图形面板能力（x-org.example.gui.panel），当前终端宿主不支持，无法安装。",
+  "missingRequired": [
+    { "apiVersion": "x-org.example.gui.panel/v1alpha1", "kind": "Panel" }
+  ]
+}

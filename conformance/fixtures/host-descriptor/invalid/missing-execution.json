@@ -1,0 +1,7 @@
+{
+  "descriptorVersion": "0.15",
+  "id": "org.example.dsh-tui",
+  "capabilities": [
+    { "apiVersion": "storage.dsh/v1alpha1", "kind": "LocalStorage" }
+  ]
+}

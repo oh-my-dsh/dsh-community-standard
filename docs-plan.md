@@ -5,12 +5,12 @@
 
 ## 0. 总览
 
-首批共 **22 份文档**，分四个优先级：
+首批共 **23 份文档**，分四个优先级：
 
 - **P0（8 份）**：v0.15 冻结前必须完成——缺一份，标准就没法被实现和验证
-- **P1（6 份）**：v0.15 发布时应当就位——缺了标准能跑，但没人看得懂、没人来参与
-- **P2（5 份）**：延期主题的 Draft——已有底稿，迁移过来挂上状态即可
-- **P3（3 份）**：调研与背景材料——已有成稿，直接迁移
+- **P1（7 份）**：v0.15 发布时应当就位——缺了标准能跑，但没人看得懂、没人来参与
+- **P2（4 份）**：延期主题的 Draft——已有底稿，迁移过来挂上状态即可
+- **P3（4 份）**：调研与背景材料——已有成稿，直接迁移
 
 已有材料的复用率很高：fabric 仓库的 4 份 RFC、3 份调研、1 份处置记录都能直接搬，真正**从零写**的只有 P0 里的 spec/ 拆分稿和 registry 条目。
 
@@ -38,7 +38,7 @@ dsh-community-standard/
 │   └── conformance.md             # P1
 ├── registry/
 │   ├── README.md                  # P1
-│   ├── capabilities/              # P0（3 条目）
+│   ├── capabilities/              # P0（2 条目）
 │   └── events/                    # P0（1 条目）
 ├── schemas/                       # P0（3 个 JSON Schema，随 spec 产出）
 ├── conformance/
@@ -48,7 +48,7 @@ dsh-community-standard/
 │   ├── plugin-author.md           # P1
 │   ├── host-maintainer.md         # P1
 │   └── migration.md               # P2
-├── research/                      # P3（3 份，迁移）
+├── research/                      # P3（4 份，迁移）
 └── decisions/                     # P3 起步（逐轮追加）
 ```
 
@@ -183,7 +183,7 @@ Component → Facet → Activation → Participant 四级模型的规范定义�
 
 ## 6. research/ 与 decisions/ —— P3，迁移与持续追加
 
-**research/**：三份成稿直接迁移——插件需求调研（12 样本）、成熟框架调研（Koishi / Chrome / VS Code）、VS Code 扩展模型调研。加统一页眉："调研快照，非规范，不代表推荐"。
+**research/**：四份成稿直接迁移——插件需求调研（12 样本）、成熟框架调研（Koishi / Chrome / VS Code）、VS Code 扩展模型调研、issue #23 逐条评论存档（community-issue-23-review）。加统一页眉："调研快照，非规范，不代表推荐"。
 
 **decisions/**：反馈链路的存档。首批三份：`round-1-issue-23.md`（13 条处置，迁移现有记录）、`round-2-issue-24.md`（5 条处置，从 v0.15 §5 抽出）、`round-3-discussion-2714.md`（官方仓库 discussion 的后续反馈，待收集）。格式统一：意见（提出者、链接）/ 处置（已采纳 / 限定采纳 / 独立 RFC / Adapter 实验 / 不属可移植核心 / 已记录）/ 落点。规则写在文件头：新评论不静默改写 Draft，变更先过 RFC 审查再登记。
 
@@ -194,7 +194,7 @@ Component → Facet → Activation → Participant 四级模型的规范定义�
 ```text
 第一周   VERSIONING.md → spec/manifest.md（+schema+fixtures）→ spec/host-descriptor.md（+schema）
          └ 这三份定了，registry 首批条目和协商器就有了地基
-第二周   spec/negotiation.md → spec/lifecycle.md → registry 首批 4 条目
+第二周   spec/negotiation.md → spec/lifecycle.md → registry 首批 3 条目
 第三周   spec/event-envelope.md（ContentBlock 边界标注"征求意见中"）→ rfcs/0000-governance.md
          └ 0000 建议单独找 2-3 人合写，治理文档一个人写容易带私货
 随后     rfcs/0001 迁移改造 → P1 全部（facet-model / conformance / guides / GLOSSARY / registry README / template）
@@ -206,3 +206,7 @@ Component → Facet → Activation → Participant 四级模型的规范定义�
 1. **规范只写一遍**：同一条规则出现在两个文件里，第二处必须是链接。
 2. **"必须"必有 fixture**：写下一条"必须"之前，先想好违反它的 fixture 长什么样。
 3. **示意值标示意**：所有未定案的 URL、坐标、字段名，统一加"（示意，以 Registry 定案为准）"，避免占位符被当成决定传播出去——`dsh-std.example` 这种占位 URL 已经在外面流传了一次。
+
+---
+
+> **注记（2026-08）：本规划已全部完成**（各优先级文档成稿情况见 [README.md §当前状态](README.md)）；后续变更不再走本规划，一律走 RFC 流程（[rfcs/0000-governance.md](rfcs/0000-governance.md)）。

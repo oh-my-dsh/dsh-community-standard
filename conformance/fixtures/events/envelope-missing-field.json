@@ -1,0 +1,33 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/event-envelope.md §2.1。",
+  "scenario": "envelope-missing-field",
+  "spec": "spec/event-envelope.md §2.1",
+  "rule": "缺少任一必填字段的信封是非法的，宿主必须拒收并记录错误，不得尽力解析后投递半个事件。",
+  "baseEnvelope": {
+    "envelopeVersion": "0.15.0",
+    "eventType": "messages.dsh",
+    "eventVersion": "v1alpha1",
+    "eventId": "evt_01J4ZEXAMPLE7YQ8",
+    "scopeType": "session",
+    "scopeId": "sess_8f3a2c",
+    "scopeSequence": 42,
+    "correlationId": "req_7c1e9b",
+    "privacyClass": "content",
+    "redactions": [],
+    "payloadSchema": "https://dsh-std.example/schemas/messages.dsh/v1alpha1.json",
+    "payload": {
+      "direction": "received",
+      "messageId": "msg_55d1",
+      "content": [{ "type": "text", "text": "帮我看下这个报错" }]
+    }
+  },
+  "requiredFields": ["envelopeVersion", "eventType", "eventVersion", "eventId", "scopeType", "scopeId", "scopeSequence", "privacyClass", "redactions", "payloadSchema", "payload"],
+  "steps": [
+    { "action": "envelope.deliver", "mutate": "依次从 baseEnvelope 删除 requiredFields 中的一个字段后投递", "repeat": "对每个必填字段各执行一次" }
+  ],
+  "expect": [
+    "每次缺字段的投递都被拒收",
+    "每次拒收都记录稳定错误码与缺失字段名",
+    "observer 不收到任何缺字段的事件"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/event-envelope.md §2.3。",
+  "scenario": "payload-mutation",
+  "spec": "spec/event-envelope.md §2.3",
+  "rule": "信封投递给 observer 后 payload 必须不可修改：observer 的任何写操作不得影响其他 observer 或宿主侧状态。",
+  "steps": [
+    { "action": "observer.register", "observer": "mutating-observer", "note": "收到事件后尝试改写 payload.content 与 payload.messageId" },
+    { "action": "observer.register", "observer": "reading-observer", "note": "在 mutating-observer 之后收到同一事件" },
+    { "action": "envelope.deliver", "eventId": "evt_immutable_1" }
+  ],
+  "expect": [
+    "reading-observer 看到的 payload 与投递时原值一致",
+    "宿主侧保存的事件状态不受改写影响",
+    "改写尝试不产生任何 effect ledger 记录（被静默隔离）"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/event-envelope.md §2.4 与 §4。",
+  "scenario": "redactions-required",
+  "spec": "spec/event-envelope.md §2.4 / §4",
+  "rule": "消息内容属高敏感数据：宿主必须按 privacyClass 施加 redactions；不得把完整正文交给未授权 observer。",
+  "steps": [
+    { "action": "observer.register", "observer": "unauthorized-observer", "authorized": false, "note": "未获得消息观察授权" },
+    { "action": "observer.register", "observer": "authorized-observer", "authorized": true },
+    { "action": "envelope.deliver", "privacyClass": "content", "payload": { "direction": "received", "messageId": "msg_55d1", "content": [{ "type": "text", "text": "SECRET-MESSAGE-BODY" }] } }
+  ],
+  "expect": [
+    "unauthorized-observer 收到的是裁剪后的事件（正文不含 SECRET-MESSAGE-BODY），或被拒绝投递",
+    "裁剪位置如实写入 redactions 字段",
+    "authorized-observer 按授权范围收到事件"
+  ]
+}

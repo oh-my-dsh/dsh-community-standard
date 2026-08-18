@@ -1,0 +1,16 @@
+{
+  "$schema": "https://dsh-std.example/schemas/dsh-plugin/v0.15.json",
+  "id": "com.example.minimal",
+  "name": "Minimal Plugin",
+  "version": "0.1.0",
+  "manifestVersion": "0.15",
+  "facets": {
+    "host": { "entry": "dist/host.js", "apiVersion": "v1alpha1" }
+  },
+  "contributes": {
+    "commands": [
+      { "id": "com.example.minimal.toggle", "title": "Toggle" },
+      { "id": "com.example.minimal.toggle", "title": "Toggle Again" }
+    ]
+  }
+}

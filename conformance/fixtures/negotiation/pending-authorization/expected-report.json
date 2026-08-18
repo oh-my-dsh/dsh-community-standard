@@ -1,0 +1,8 @@
+{
+  "reportVersion": "0.15",
+  "verdict": "pending-authorization",
+  "message": "宿主支持该插件，但它需要观察消息内容，等待用户授权后才能激活。",
+  "awaitingAuthorization": [
+    { "apiVersion": "messages.dsh/v1alpha1", "kind": "MessageObserver" }
+  ]
+}

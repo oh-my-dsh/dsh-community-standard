@@ -1,0 +1,18 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/lifecycle.md §2.6。",
+  "scenario": "ledger-append-only",
+  "spec": "spec/lifecycle.md §2.6",
+  "rule": "effect ledger 必须是 append-only：已有记录不得修改或删除，状态变化以新记录表达。",
+  "steps": [
+    { "action": "host.startup", "until": "ready" },
+    { "action": "plugin.activate", "plugin": "com.example.alpha" },
+    { "action": "broker.register", "by": "com.example.alpha", "effectKind": "command-handler", "note": "产生一条 bind 记录 R" },
+    { "action": "ledger.attempt-overwrite", "record": "R", "note": "尝试覆盖 R 的 state 字段" },
+    { "action": "ledger.attempt-delete", "record": "R" }
+  ],
+  "expect": [
+    "覆盖与删除操作均被拒绝（报错或明确 no-op）",
+    "R 的原始内容保持不变",
+    "后续状态变化只能以 sequence 更大的新记录表达"
+  ]
+}

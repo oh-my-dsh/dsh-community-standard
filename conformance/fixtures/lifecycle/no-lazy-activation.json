@@ -1,0 +1,16 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/lifecycle.md §2.2。",
+  "scenario": "no-lazy-activation",
+  "spec": "spec/lifecycle.md §2.2",
+  "rule": "generation-scoped eager activation：执行 command、请求 Provider 或匹配 subscription 都不能激活一个 inactive 插件。",
+  "steps": [
+    { "action": "host.startup", "until": "ready", "note": "组装 runtime generation 时插件 com.example.lazy 未被选中，保持 inactive" },
+    { "action": "command.execute", "id": "com.example.lazy.some-command", "note": "该 command 由 com.example.lazy 在 manifest contributes 中声明" },
+    { "action": "event.dispatch", "eventType": "messages.dsh", "eventVersion": "v1alpha1", "note": "命中 com.example.lazy 声明的 subscription" }
+  ],
+  "expect": [
+    "两次操作后 com.example.lazy 仍保持 inactive，未进入 activating",
+    "command 执行得到明确的『插件未激活』错误，而不是触发激活",
+    "事件投递不送达 inactive 插件，且不激活它"
+  ]
+}

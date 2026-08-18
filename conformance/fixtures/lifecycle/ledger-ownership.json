@@ -1,0 +1,18 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/lifecycle.md §2.5。",
+  "scenario": "ledger-ownership",
+  "spec": "spec/lifecycle.md §2.5",
+  "rule": "所有标准注册必须经过 Broker 并归属到具体插件的具体一次 activation；插件或 Adapter 不得绕过 Broker 自行注册后声称归某个 activation 所有。",
+  "steps": [
+    { "action": "host.startup", "until": "ready" },
+    { "action": "plugin.activate", "plugin": "com.example.alpha" },
+    { "action": "plugin.activate", "plugin": "com.example.beta" },
+    { "action": "broker.register", "by": "com.example.alpha", "effectKind": "command-handler" },
+    { "action": "broker.register", "by": "com.example.beta", "effectKind": "command-handler", "claimAs": "com.example.alpha", "note": "beta 尝试冒充 alpha 作为 owner" }
+  ],
+  "expect": [
+    "每条注册在 ledger 中带有真实的当前 pluginId + activationId",
+    "beta 冒充 owner 的注册被拒绝，或被记录为 beta 自己的归属并可检出冒充企图",
+    "ledger 中不存在 owner 与实际注册者不一致的记录"
+  ]
+}

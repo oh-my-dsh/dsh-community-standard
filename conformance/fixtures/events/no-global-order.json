@@ -1,0 +1,17 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/event-envelope.md §2.2。",
+  "scenario": "no-global-order",
+  "spec": "spec/event-envelope.md §2.2",
+  "rule": "信封不隐含全局顺序：不同 scope 之间、不同 eventType 之间的先后关系没有任何保证；插件不得依据跨 scope 到达先后推断因果关系。",
+  "steps": [
+    { "action": "envelope.deliver", "scope": "session/sess_A", "scopeSequence": 1 },
+    { "action": "envelope.deliver", "scope": "session/sess_B", "scopeSequence": 1 },
+    { "action": "envelope.deliver", "scope": "session/sess_A", "scopeSequence": 2 },
+    { "action": "envelope.deliver", "scope": "session/sess_B", "scopeSequence": 2, "note": "两次运行以不同交错顺序投递（A1,B1,A2,B2 与 B1,A1,B2,A2）" }
+  ],
+  "expect": [
+    "两种交错下消费方均不得做跨 scope 的全局顺序假设",
+    "测试消费方只依据各自 scope 内的 scopeSequence 排序，事件处理结果与交错方式无关",
+    "需要关联时使用 correlationId，而不是到达先后"
+  ]
+}

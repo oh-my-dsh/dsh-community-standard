@@ -1,0 +1,10 @@
+{
+  "$schema": "https://dsh-std.example/schemas/dsh-plugin/v0.15.json",
+  "id": "com.example.bleeding-edge",
+  "name": "Bleeding Edge Plugin",
+  "version": "0.2.0",
+  "manifestVersion": "0.15",
+  "facets": {
+    "host": { "entry": "dist/host.js", "apiVersion": "v2alpha1" }
+  }
+}

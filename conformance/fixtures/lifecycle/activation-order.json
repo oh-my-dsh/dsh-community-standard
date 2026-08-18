@@ -1,0 +1,15 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/lifecycle.md §2.1。",
+  "scenario": "activation-order",
+  "spec": "spec/lifecycle.md §2.1",
+  "rule": "宿主必须在 ready 状态下、执行任何插件代码之前，按 discover → validate → negotiate → authorize 顺序完成前置阶段；跳过任一阶段直接进入 activating 是非法的。",
+  "steps": [
+    { "action": "host.startup", "until": "ready" },
+    { "action": "plugin.attempt-activate", "plugin": "com.example.out-of-order", "skipStages": ["validate", "negotiate", "authorize"] }
+  ],
+  "expect": [
+    "协商器拒绝该请求或宿主报错，activation 不进入 activating",
+    "该 activation 不存在 active 记录，effect ledger 中无归其所有的 create/bind 记录",
+    "错误原因对用户可读，指明缺失的前置阶段"
+  ]
+}

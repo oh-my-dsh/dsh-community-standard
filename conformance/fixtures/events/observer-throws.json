@@ -1,0 +1,17 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/event-envelope.md §2.4 与 §4。",
+  "scenario": "observer-throws",
+  "spec": "spec/event-envelope.md §2.4 / §4",
+  "rule": "observer 抛异常或超时必须被隔离：记错误、可取消其订阅，不影响消息主流程与其他 observer。",
+  "steps": [
+    { "action": "observer.register", "observer": "throwing-observer", "note": "回调直接抛异常" },
+    { "action": "observer.register", "observer": "healthy-observer" },
+    { "action": "message.send", "text": "测试消息", "note": "触发 messages.observe 投递" }
+  ],
+  "expect": [
+    "throwing-observer 的异常被捕获并记录稳定错误",
+    "healthy-observer 正常收到该事件",
+    "消息主流程正常完成",
+    "宿主可以取消 throwing-observer 的订阅，但不得影响其他 observer"
+  ]
+}

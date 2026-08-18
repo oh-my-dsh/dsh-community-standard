@@ -1,0 +1,5 @@
+{
+  "reportVersion": "0.15",
+  "verdict": "compatible",
+  "message": "静态协商通过：插件未声明任何契约依赖，可在当前宿主激活。"
+}

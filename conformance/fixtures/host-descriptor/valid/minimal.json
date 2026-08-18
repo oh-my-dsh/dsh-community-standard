@@ -1,0 +1,11 @@
+{
+  "descriptorVersion": "0.15",
+  "id": "org.example.dsh-tui",
+  "execution": {
+    "environment": "node",
+    "trustMode": "trusted-in-process"
+  },
+  "capabilities": [
+    { "apiVersion": "storage.dsh/v1alpha1", "kind": "LocalStorage" }
+  ]
+}

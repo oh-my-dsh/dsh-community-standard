@@ -1,0 +1,17 @@
+{
+  "$comment": "场景化 fixture：非 schema 校验对象，由 conformance suites 驱动宿主执行 steps 并断言 expect。对应 spec/lifecycle.md §2.3。",
+  "scenario": "cleanup-repeatable",
+  "spec": "spec/lifecycle.md §2.3",
+  "rule": "插件清理必须设计为可重复执行：deactivate 可能被调用零次、一次或多次。",
+  "steps": [
+    { "action": "host.startup", "until": "ready" },
+    { "action": "plugin.activate", "plugin": "com.example.alpha" },
+    { "action": "plugin.deactivate", "plugin": "com.example.alpha" },
+    { "action": "plugin.deactivate", "plugin": "com.example.alpha", "note": "对同一 activation 再次调用 deactivate" }
+  ],
+  "expect": [
+    "第二次 deactivate 不抛异常",
+    "第二次 deactivate 不产生重复 effect（ledger 中无重复的 release / create 记录）",
+    "activation 到达 disposed 并保持终态"
+  ]
+}

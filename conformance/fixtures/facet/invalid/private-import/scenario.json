@@ -1,0 +1,16 @@
+{
+  "$comment": "package inspection 类 fixture：entry.js 是被检查的插件入口，由 conformance suites 做静态 import 分析后断言 expect。对应 spec/facet-model.md §2.2 第 3 条与 §4。",
+  "scenario": "private-import",
+  "spec": "spec/facet-model.md §2.2 / §4",
+  "rule": "host facet 必须只依赖标准 facet 上下文，不得 import 宿主私有 API、Adapter 内部模块或 dsh/Cordis 包。",
+  "input": "entry.js",
+  "violatingImports": ["dsh/internal", "@cordis/adapter-private"],
+  "steps": [
+    { "action": "package.scan-imports", "entry": "entry.js" }
+  ],
+  "expect": [
+    "检出 violatingImports 中的每一条非标准依赖",
+    "validate 阶段失败并给出人话报错（指明违规 import 与规则出处）",
+    "插件不进入 activating"
+  ]
+}
