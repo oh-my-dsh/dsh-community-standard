@@ -47,7 +47,7 @@ A behavior only counts as a contract when it appears in **spec + schema/registry
 - **I am a plugin author** → [guides/plugin-author.md](guides/plugin-author.md) → [spec/manifest.md](spec/manifest.md) → [registry/](registry/)
 - **I am a host / terminal maintainer** → [guides/host-maintainer.md](guides/host-maintainer.md) → [spec/host-descriptor.md](spec/host-descriptor.md) → [spec/negotiation.md](spec/negotiation.md)
 - **I want to help make the standard** → [rfcs/0000-governance.md](rfcs/0000-governance.md) → [rfcs/template.md](rfcs/template.md) → the disposition records in `decisions/`
-- **I am dsh official** → §7 of rfcs/0001 (what we do not ask for / what we ask for / the value to the official project) and §9 (this round's five questions)
+- **I am dsh official** → [§7 Relationship with official dsh](rfcs/0001-core-contract.md#_7-relationship-with-official-dsh) of rfcs/0001 (what we do not ask for / what we ask for / the value to the official project) and [§9 Questions for this round of comment](rfcs/0001-core-contract.md#_9-questions-for-this-round-of-comment-five)
 
 ## Current status
 

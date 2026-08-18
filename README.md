@@ -47,7 +47,7 @@ dsh 生态已经有 3,800+ 个插件仓库，但底下有三条裂缝：
 - **我是插件作者** → [guides/plugin-author.md](guides/plugin-author.md) → [spec/manifest.md](spec/manifest.md) → [registry/](registry/)
 - **我是宿主 / 终端维护者** → [guides/host-maintainer.md](guides/host-maintainer.md) → [spec/host-descriptor.md](spec/host-descriptor.md) → [spec/negotiation.md](spec/negotiation.md)
 - **我想参与标准制定** → [rfcs/0000-governance.md](rfcs/0000-governance.md) → [rfcs/template.md](rfcs/template.md) → `decisions/` 处置记录
-- **我是 dsh 官方** → rfcs/0001 的 §7（我们不请求什么 / 请求什么 / 对官方的价值）和 §9（本轮五个问题）
+- **我是 dsh 官方** → rfcs/0001 的 [§7 与 dsh 官方的关系](rfcs/0001-core-contract.md#_7-与-dsh-官方的关系)（我们不请求什么 / 请求什么 / 对官方的价值）和 [§9 本轮征求意见问题](rfcs/0001-core-contract.md#_9-本轮征求意见问题-五个)
 
 ## 当前状态
 
