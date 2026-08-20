@@ -2,7 +2,7 @@
 
 > **状态：草案 v0（未表决，供社区讨论）**
 > 本文是新增文档提案，目标位置 `spec/facet-api.md`。它把 [facet-model.md](facet-model.md) §2.3 的"最小 API 面"从三行描述展开成逐条签名定义——SDK 与宿主照此实现，插件作者照此编码。
-> 标注 **【决策点 N】** 的地方是本文刻意留给社区表决的分叉；除决策点外的写法是起草者抛出的初稿（strawman，就是立起来让大家打的靶子），同样欢迎推翻。
+> 原标注 **【决策点 N】** 的九处分叉已于 2026-08-20 由起草者定案，理由随文标注；按 lazy consensus，评审期内无实质异议即生效。
 > 按原则 ⑧：任何参考实现（含 fabric 的 `.d.ts`）与本文冲突时，以本文定稿版为准；本文定稿前，实现方不得把任何签名当作稳定契约传播。
 
 ## 0. 这份文档和其他文档的关系
@@ -39,7 +39,7 @@ const last = await activation.storage.get('lastMessageId')   // 具名属性式
 
 - 这个设计同时消除了现有文档的一处冲突：facet-model 规定上下文"只暴露三个面"，而 registry 条目示例使用了 `activation.storage` 这样的表外方法。定稿后，"三个面"落实为 `extensions` / `scope` / `contracts`，registry 示例随之修订。
 - **顺手的写法仍然保留**：SDK 可以把 `activation.storage` 作为语法糖提供，底层仍然调用统一窗口。但它属于 SDK 便利层，不是标准契约——宿主一致性测试只测统一窗口。
-- **【决策点 1】** 本文已按统一窗口起草全部签名。若有人主张把具名属性写进标准本身，需要先回答：每新增一条契约，是否接受全生态随 SDK 发版升级一次？如评审期内没有成立的异议，本设计随文档定稿。
+- **（定案）** 本文按统一窗口定稿全部签名，具名属性不进标准。理由：每接受一条新契约，具名属性都要求 SDK 发新版、全生态跟着升级——这正是元协议要消灭的中心化发版瓶颈。
 
 ## 2. `defineFacet(setup)`
 
@@ -52,7 +52,7 @@ function defineFacet(
 - **参数** `setup`：activation 进入 `activating` 阶段时，由宿主调用，且仅调用一次。可以是 async 函数。
 - **返回值** `FacetDefinition`：不透明对象，必须作为 entry 模块的默认导出（规则见 [facet-model.md](facet-model.md) §2.2）。`setup` 可选返回 `FacetHandle`（v0.15 为空接口，保留位）。
 - **错误**：`setup` 抛异常或超时 → 本次 activation 直接进入 `disposed`，ledger 记失败，不影响其他插件（见 [lifecycle.md](lifecycle.md) §2.1）。
-- **【决策点 2】** `setup` 超时：A. 标准规定统一默认值（提议 10s），宿主可配置；B. 完全由宿主决定并在 Host Descriptor 公示。起草者倾向 B——不同宿主的启动预算差异太大，但必须公示，插件才能有预期。
+- **（定案）** `setup` 超时时长由宿主决定，且**必须**在 Host Descriptor 公示。理由：无头服务器和桌面 GUI 的启动预算差异太大，标准统一不出一个合理的秒数；但公示是硬义务，不公示插件就无法建立预期。
 - **生命周期约束**：`setup` 内的注册全部归本次 activation 所有；模块顶层不得有业务副作用（重复激活语义见 [lifecycle.md](lifecycle.md) §2.4）。
 
 ## 3. `activation.extensions.publish(coordinate, id, implementation)`
@@ -68,7 +68,7 @@ publish<T extends ContractKind>(
 - **参数**：`coordinate` 必须是 registry 中已登记的条目，且已在 manifest `requires.contracts` 声明；`id` 对 Command 类契约必须等于 `contributes` 中已声明的 id；`implementation` 的类型由契约条目定义（§6）。
 - **返回值**：`Disposable`。调用 `dispose()` 撤回本次发布；activation 结束时未撤回的发布由宿主统一释放并记入 ledger。
 - **错误**（错误码见 §7）：坐标未声明 → `E_CONTRACT_NOT_DECLARED`；id 未在 contributes 声明（Command 类）→ `E_CONTRIBUTION_NOT_DECLARED`；同一 activation 内重复发布同一 (coordinate, id) → `E_DUPLICATE_PUBLISH`；在 `active` / `activating` 之外调用 → `E_WRONG_STATE`。
-- **【决策点 3】** 重复发布语义：A. 抛 `E_DUPLICATE_PUBLISH`（提议）；B. 后者替换前者并记 ledger `replace`。起草者倾向 A——replace 语义与 RFC 0003 的 Provider 替换重叠，v0.15 不抢跑。
+- **（定案）** 重复发布抛 `E_DUPLICATE_PUBLISH`，不做静默替换。理由：静默 replace 会把"同一个 id 被绑了两次"这种 bug 变成运行时行为分歧；替换语义与 RFC 0003 的 Provider 替换重叠，v0.15 不抢跑。
 
 ## 4. `activation.scope.add(dispose)`
 
@@ -78,7 +78,7 @@ add(dispose: () => void | Promise<void>): void
 
 - **语义**：注册清理函数，deactivate 时由宿主调用。**调用顺序为 LIFO**（后注册先清理），与资源依赖的常见方向一致。
 - **约束**：清理函数必须可重复执行；可能被调用零次（崩溃）、一次或多次（见 [lifecycle.md](lifecycle.md) §2.3）。抛异常 → 宿主捕获、记 `cleanup-failed`、继续执行其余清理。
-- **【决策点 4】** 单个清理函数的时间边界：提议宿主统一 5s 上限、超时记 `cleanup-failed`；数值待表决。
+- **（定案）** 单个清理函数默认 5s 上限，宿主可调整但必须在 Host Descriptor 公示；超时记 `cleanup-failed`，继续执行其余清理。理由：清理跑飞不能拖住整个 deactivate；时限长短因宿主而异，处理方式与 setup 超时一致。
 
 ## 5. `activation.contracts.get(coordinate)`
 
@@ -87,7 +87,7 @@ get<T extends ContractKind>(coordinate: ContractCoordinate): HandleOf<T>
 ```
 
 - **语义**：获取协商通过的契约句柄。required 契约的句柄保证存在（协商没过根本不会激活）；optional 契约缺失时**本方法抛 `E_CONTRACT_UNAVAILABLE`**，配套 `activation.contracts.has(coordinate): boolean` 供降级路径判断。
-- **【决策点 5】** optional 缺失时 `get` 的行为：A. 抛错 + `has()` 判断（提议——显式降级，与 [negotiation.md](negotiation.md)"optional 缺失时对应 API 不存在"一致）；B. 返回 `undefined`（类型上到处都要判空）。
+- **（定案）** optional 缺失时 `get` 抛 `E_CONTRACT_UNAVAILABLE`，配套 `has()` 供降级判断。理由：显式降级与 [negotiation.md](negotiation.md)"optional 缺失时对应 API 不存在"一致；返回 `undefined` 则类型上处处要判空，漏判就是运行时炸。
 - **错误**：坐标未在 manifest 声明 → `E_CONTRACT_NOT_DECLARED`（即使宿主支持也抛——只能用声明过的，这是"声明什么才能用什么"在运行时的强制检查点）。
 
 ## 6. v0.15 三条契约的句柄接口
@@ -106,8 +106,8 @@ interface LocalStorageHandle {
 ```
 
 - 按 Component 隔离；值为可 JSON 序列化数据。
-- **【决策点 6】** 值类型：A. `JsonValue`（提议——省去每个插件自己 stringify）；B. 仅 `string`。
-- **【决策点 7】** 配额：提议单 Component 默认 5 MB、单值 512 KB，超限抛 `E_STORAGE_QUOTA`；数值待表决。写入内容永不进 ledger。
+- **（定案）** 值类型为 `JsonValue`。理由：可 JSON 序列化本来就是存储的序列化边界；只收 `string` 等于让每个插件自己写一遍 stringify/parse，还要各自处理解析失败。
+- **（定案）** 配额默认单 Component 5 MB、单值 512 KB，超限抛 `E_STORAGE_QUOTA`；宿主可提高配额并在 Host Descriptor 公示。写入内容永不进 ledger。
 
 ### 6.2 `Command`（commands.dsh/v1alpha1）
 
@@ -120,7 +120,7 @@ type CommandHandler = (invocation: {
 
 - 扁平动作叶子（flat action leaf）：不收参数 payload、不返回展示内容——参数与富返回依赖 RFC 0002 的 presentation 分层，v0.15 刻意不开口（见 registry 条目"明确不包含什么"）。
 - handler 抛异常 → 宿主捕获、按 `correlationId` 记稳定错误、向用户显示人话失败提示；不得让异常逃逸到宿主主流程。
-- **【决策点 8】** handler 超时：提议默认 30s、宿主可配置并公示；超时视同异常。
+- **（定案）** handler 默认 30s 超时，宿主可配置并在 Host Descriptor 公示；超时视同异常（宿主捕获、按 `correlationId` 记稳定错误）。
 
 ### 6.3 `MessageObserver`（messages.dsh/v1alpha1）
 
@@ -132,7 +132,7 @@ interface MessageObserverHandle {
 
 - `envelope` 为 [event-envelope.md](event-envelope.md) 定义的只读信封；payload 类型在 ContentBlock 边界冻结前标注 `unknown`，SDK 不得提前给出具体字段类型。
 - callback 同步执行、必须快速返回；重活自行异步调度。callback 抛异常 → 隔离本 observer，不影响主流程与其他 observer（见 [event-envelope.md](event-envelope.md) §2.4）。
-- **【决策点 9】** 背压：提议每 observer 有界队列（默认 256 条），溢出时丢弃最旧的消息，并在 ledger 里记一条告警（只记一次）；策略待表决。
+- **（定案）** 背压策略：每 observer 有界队列，默认 256 条；溢出时丢弃最旧的消息，并在 ledger 里记一条告警（只记一次）。理由：无界队列会让一个慢 observer 拖垮宿主内存；丢最旧并留痕，比阻塞事件主流程或静默丢失都诚实。
 - 返回的 `Disposable` 应挂到 `activation.scope.add`。
 
 ## 7. 错误模型
@@ -172,7 +172,7 @@ interface StandardError extends Error {
 
 ## 9. 定稿路径（提议）
 
-1. 本文以草案挂到讨论区，9 个决策点开一个 checklist issue 逐项表决（建议每项 72h lazy consensus）。
+1. 本文以草案挂到讨论区，九处定案随文公示（lazy consensus，评审期内无实质异议即生效）。
 2. fabric 按表决结果出 `.d.ts` + 原型，跑通三个示例插件。
 3. 原型发现的签名问题回灌本文（改文档，不是只改代码），随后 schema / fixtures 落地，本文并入 v0.16 冻结。
 

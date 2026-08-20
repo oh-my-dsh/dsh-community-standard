@@ -27,7 +27,8 @@ dsh-community-standard/
 │   ├── 0001-core-contract.md      # P0（v0.15 正文，即主 RFC）
 │   ├── 0002-runtime-presentation.md   # P2（迁移）
 │   ├── 0003-service-composition.md    # P2（迁移）
-│   └── 0004-provenance-diagnostics.md # P2（迁移）
+│   ├── 0004-provenance-diagnostics.md # P2（迁移）
+│   └── 0005-declarative-views.md  # 后规划期新增（2026-08-20 初稿）
 ├── spec/
 │   ├── manifest.md                # P0
 │   ├── host-descriptor.md         # P0

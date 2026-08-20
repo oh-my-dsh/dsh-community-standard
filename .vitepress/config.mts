@@ -24,6 +24,7 @@ const zhSidebar: DefaultTheme.SidebarItem[] = [
       { text: '0002 Runtime/Presentation 分层', link: '/rfcs/0002-runtime-presentation' },
       { text: '0003 Service 组合', link: '/rfcs/0003-service-composition' },
       { text: '0004 溯源与诊断', link: '/rfcs/0004-provenance-diagnostics' },
+      { text: '0005 声明式视图贡献点', link: '/rfcs/0005-declarative-views' },
     ],
   },
   {
@@ -71,6 +72,7 @@ const zhSidebar: DefaultTheme.SidebarItem[] = [
       { text: '成熟框架调研', link: '/research/mature-plugin-frameworks' },
       { text: 'VS Code 扩展模型', link: '/research/vscode-extension-model' },
       { text: 'issue #23 评论存档', link: '/research/community-issue-23-review' },
+      { text: 'UI 层设计规划', link: '/research/ui-layer-plan' },
     ],
   },
   {
