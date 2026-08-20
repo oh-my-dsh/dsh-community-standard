@@ -147,24 +147,32 @@ export default defineFacet((activation) => {
 
 ## 第四步：宿主没有消息能力，照样能活
 
-不是每个宿主都实现了消息观察。把第三步的契约改成 optional，插件在缺能力的宿主上照常激活，走降级分支：
+第三步其实埋了个雷。消息观察写在 `requires` 里，默认是**必填**的——如果某个宿主根本没实现消息观察，整个插件会被直接拒载。也就是说，只因为"听消息打招呼"这个添头缺了，用户连 `/hello` 都用不上。
+
+这不对劲。添头功能不该绑架主功能。解决办法是给这条契约加一个 `"optional": true`：
 
 ```json
 { "apiVersion": "messages.dsh/v1alpha1", "kind": "MessageObserver", "optional": true }
 ```
 
+加上它之后，协商的结局就变了：宿主有这个能力，照常发给你；宿主没有，也照样放行激活，只是这个能力不发。所以代码里要先问一句"有没有"，再决定走哪条路：
+
 ```ts
 const coordinate = { apiVersion: 'messages.dsh/v1alpha1', kind: 'MessageObserver' }
 
 if (activation.contracts.has(coordinate)) {
+  // 宿主有这个能力：和第三步一样订阅消息
   const messages = activation.contracts.get(coordinate)
   activation.scope.add(messages.observe(/* ... */).dispose)
 } else {
+  // 宿主没有：关掉添头功能，主功能不受影响
   activation.log.info('当前宿主不支持消息观察，打招呼功能已关闭，/hello 仍然可用')
 }
 ```
 
-required 和 optional 的分寸：**没有它插件就不成立的，写 required（缺了宁可拒载）；没有它只是少个添头的，写 optional 并认真写降级分支。** 拒载不是事故——宿主会给出机器可读的报告，告诉用户缺什么，而不是装上再炸。
+required 和 optional 怎么选，判断标准只有一条：**没有它插件就不成立的，写 required——缺了宁可拒载；没有它只是少个添头的，写 optional，并且认真写好 else 分支。**
+
+顺便说一句：拒载不是事故。宿主会给出一份机器可读的报告，明明白白告诉用户缺什么——这比装上再炸体面得多。
 
 ## 第五步：装之前，先跑本地校验
 
