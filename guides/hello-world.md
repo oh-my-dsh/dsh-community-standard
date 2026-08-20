@@ -11,9 +11,9 @@
 3. 听到新消息时打声招呼；
 4. 宿主没有消息能力时照样能活；
 5. 装上宿主之前，先跑一遍本地校验；
-6. （预览）把 Hello World 放进侧边栏、对话 tab 和右侧面板。
+6. 把 Hello World 放进侧边栏、对话 tab 和右侧面板。
 
-整个插件自始至终只有**两个文件**：一份声明（`dsh-plugin.json`），一份代码（`host.ts`）。声明告诉宿主"我要什么"，代码只在协商通过后拿到声明过的能力——这就是这套标准的全部玩法。
+整个插件的核心自始至终只有**两个文件**：一份声明（`dsh-plugin.json`），一份代码（`host.ts`）；第六步会多出一个可选的视图组件文件。声明告诉宿主"我要什么"，代码只在协商通过后拿到声明过的能力——这就是这套标准的全部玩法。
 
 ## 第一步：响应 `/hello` 命令
 
@@ -163,34 +163,59 @@ npx dsh-plugin-verify ./dsh-plugin.json
 
 它会静态检查：`$schema` 是否可识别、字段是否合法、契约坐标在 [registry/](../registry/README.md) 里查不查得到、`contributes` 的 id 有没有和已知插件撞车、声明与绑定是否一致。全过了，才轮到宿主做协商；协商的三种结局（兼容 / 待授权 / 拒载）和报错对照表，见[插件作者指南](plugin-author.md) §5–§6。
 
-## 第六步（预览）：把 Hello World 摆进 UI
+## 第六步：把 Hello World 摆进 UI
 
-> **下面全部不是 v0.15 标准。** v0.15 只规范 host facet；`client` / `worker` 是保留名，侧边栏、tab、面板这类声明式 UI 整体归 [RFC 0002](../rfcs/0002-runtime-presentation.md)，形态未表决。以下代码是**假想语法**，只用来展示方向，不要照抄实现。
+> **本节基于 [RFC 0005](../rfcs/0005-declarative-views.md)（声明式视图贡献点，Draft，目标 v0.16）。** 方向已经定稿，但宿主实现还在跟进——装上今天的宿主，协商报告会如实告诉你"这个契约我还不支持"。这不是缺陷，正是这套标准的设计意图：装之前就知道，而不是装上再炸。
 
-如果 RFC 0002 落地，"在左边侧边栏加一个 Hello World 入口"大概长这样——还是那份 manifest，多几行声明：
+还是那份 manifest，玩法也一样：先在 `requires` 里声明视图契约，再在 `contributes.views` 里声明视图。最小的形态是**纯声明视图**——只给标题和静态文本，宿主原生渲染，一行 UI 代码都不用写：
 
 ```jsonc
-// 假想语法，非标准
+// 字段布局为示意，以 spec 定稿为准
+"requires": {
+  "contracts": [
+    // ……前几步的契约照旧
+    { "apiVersion": "views.dsh/v1alpha1", "kind": "ViewContribution", "optional": true }
+  ]
+},
 "contributes": {
   "views": [
-    { "id": "com.example.hello-dsh.sidebar", "title": "Hello World", "location": "sidebar.left" }
+    {
+      "id": "com.example.hello-dsh.sidebar",
+      "title": "Hello World",
+      "location": "sidebar.footer",        // 左侧边栏底部
+      "static": { "text": "Hello World！" } // 纯声明：宿主自己渲染
+    }
   ]
 }
 ```
 
-对话列表上加一个 tab、右侧边栏加一块面板，换的也只是 `location`：
+想摆在对话区 tab 或右侧面板，换 `location` 就行。这两个位置通常配富组件——`component` 指向一个预构建 bundle，宿主挂载它、注入标准 props，卸载时自动清理：
 
 ```jsonc
-// 假想语法，非标准
-{ "id": "com.example.hello-dsh.chat-tab", "title": "Hello World", "location": "conversation.tab" }
-{ "id": "com.example.hello-dsh.inspector", "title": "Hello World", "location": "sidebar.right" }
+"contributes": {
+  "views": [
+    { "id": "com.example.hello-dsh.chat-tab", "title": "Hello", "location": "conversation.tab", "component": "dist/views/hello.js" },
+    { "id": "com.example.hello-dsh.inspector", "title": "Hello", "location": "details.panel", "component": "dist/views/hello.js" }
+  ]
+}
 ```
 
-方向上依然是同一个套路：**你声明"有什么"，宿主决定"摆在哪、长什么样"**。之所以 v0.15 刻意不做，是因为声明式 UI 要穿越 Remote SSH 这类 transport 分层，做仓促了会在半路丢子树——这个反例和完整设计见 [RFC 0002](../rfcs/0002-runtime-presentation.md)。今天的正确写法，就是第一到第五步的 host 侧能力。
+```tsx
+// src/views/hello.tsx（示意：预构建为 dist/views/hello.js，react 由宿主作为种子模块提供）
+export default function HelloView() {
+  return <div>Hello World！</div>
+}
+```
+
+三条规则，和前五步一脉相承：
+
+- **`location` 只能写 registry 里登记过的位置**（一期就三个：`conversation.tab`、`details.panel`、`sidebar.footer`）。宿主没实现的位置，协商时就报出来——标了 `optional: true` 就降级，没标就拒载，总之不会装上再炸。
+- **排布写 `priority`（`high | normal | low`），不写数字。** 你的插件不需要知道别的插件存在，宿主按优先级类别排。
+- **摆成什么样是宿主的事。** 同一个 `conversation.tab`，Web 宿主渲染成页签，TUI 宿主可能渲染成切换面板——插件不关心，也不能关心。
 
 ## 回头看一眼
 
-六步走完，这个插件碰过的所有东西：一份静态 JSON、一个 `defineFacet`、三面上下文（`extensions` / `contracts` / `scope`）、三条 registry 契约。没有 patch，没有反射探测，没有宿主内部函数。这就是为什么它能穿越 dsh 上游的更新周期——它依赖的是契约，不是实现。
+六步走完，这个插件碰过的所有东西：一份静态 JSON、一个 `defineFacet`、三面上下文（`extensions` / `contracts` / `scope`）、四条 registry 契约。没有 patch，没有反射探测，没有宿主内部函数。这就是为什么它能穿越 dsh 上游的更新周期——它依赖的是契约，不是实现；官方改内部 UI，变化由 SDK 适配层吸收，插件零感知。
 
 想写真正的插件，接着读[插件作者指南](plugin-author.md)；从 patch 流派迁移过来的，直接读[迁移指南](migration.md)。
 
@@ -200,4 +225,4 @@ npx dsh-plugin-verify ./dsh-plugin.json
 - [spec/manifest.md](../spec/manifest.md) —— manifest 逐字段权威定义
 - [registry/](../registry/README.md) —— 三条契约坐标的机器可读条目
 - [插件作者指南](plugin-author.md) —— 声明/绑定纪律、协商报告与报错对照
-- [RFC 0002](../rfcs/0002-runtime-presentation.md) —— UI 分层与第六步预览的归属
+- [RFC 0005](../rfcs/0005-declarative-views.md) —— 第六步视图贡献点的标准本体（含分期路线图）
