@@ -9,7 +9,7 @@
 
 **flat action leaf**：一个全局唯一的 command ID 对应一个已声明的 action 和一个归 activation 所有的 handler，完事。
 
-- 命令元数据（ID、标题）的权威来源是 manifest `contributes`——宿主在插件运行前即可发现；插件代码只按已声明的 ID 绑定 handler（声明与绑定的一致性规则见 [spec/manifest.md](../../spec/manifest.md)，此处不复述）。
+- 命令元数据（ID、标题）的权威来源是 manifest `contributes`——宿主在插件运行前就能发现这些命令；插件代码只按已声明的 ID 绑定 handler（声明与绑定的一致性规则见 [spec/manifest.md](../../spec/manifest.md)，此处不复述）。
 - 宿主可以把同一个 action 放进 palette、菜单、按钮或 TUI 命令行，但**不能改变它的身份**：同一个 ID 在任何入口触发的是同一个 handler。
 - handler 的注册归 activation 所有：随 activation 创建、随 deactivate 释放，并记入 effect ledger（见 [spec/lifecycle.md](../../spec/lifecycle.md) §2.5–2.6）。
 

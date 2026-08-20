@@ -8,12 +8,12 @@
 
 我们使用了两组证据：
 
-1. 公开的 [DSH 1024Store / awesome DeepSeek Harness 插件目录](https://github.com/imsai-sh/awesome-deepseek-harness-plugins)，快照为 commit [`415a2d0`](https://github.com/imsai-sh/awesome-deepseek-harness-plugins/tree/415a2d0a78c93b3671dc2718721e52f39f06fb96)，其自动生成 README 在 2026-08-17 列出 3,809 个仓库；
+1. 公开的 [DSH 1024Store / awesome DeepSeek Harness 插件目录](https://github.com/imsai-sh/awesome-deepseek-harness-plugins)，快照为 commit [`415a2d0`](https://github.com/imsai-sh/awesome-deepseek-harness-plugins/tree/415a2d0a78c93b3671dc2718721e52f39f06fb96)，其自动生成的 README 在 2026-08-17 共列出 3,809 个仓库；
 2. 对十二个开源插件做静态源码检查，覆盖 UI、工具、会话、记忆、模型、文件、外部集成、包管理和终端。
 
 我们 clone 仓库并阅读 manifest、patch、Host/Client 入口、测试和文档，没有安装依赖或执行第三方插件代码。这是按功能选取的样本，不是随机统计；它可以说明需要哪些 contract，不能说明流行度或代码质量。
 
-目录本身也证明了更强 manifest 的必要性：当前生成分类中有 65 个 UI 插件、81 个工具插件、51 个开发/运行时插件、24 个工作流插件、20 个会话/消息插件、19 个通知/集成插件、17 个记忆插件、7 个模型/provider 插件、6 个主题，以及 3,491 个仍待分类条目。只知道包名和 patch 文件，无法可靠判断兼容性、权限、运行 face、原生依赖或扩展点。
+目录本身也证明了更强 manifest 的必要性：当前生成分类中有 65 个 UI 插件、81 个工具插件、51 个开发/运行时插件、24 个工作流插件、20 个会话/消息插件、19 个通知/集成插件、17 个记忆插件、7 个模型/provider 插件、6 个主题，以及 3,491 个仍待分类条目。目录只提供包名和 patch 文件，无法据此可靠判断兼容性、权限、运行 face、原生依赖或扩展点。
 
 ## 2. 代表性插件
 
@@ -51,7 +51,7 @@
 
 ### 3.2 UI 贡献与 Renderer
 
-样本中的 UI 需求结构完全不同：
+样本中的 UI 需求在结构上差异很大：
 
 - 设置 section 和 row；
 - 命令面板、菜单动作、状态、通知和对话框；
@@ -87,11 +87,11 @@
 - 关联子会话、任务及其 owner；
 - 宿主支持时追加带 namespace 的自定义持久事件。
 
-观察、动作、拦截、上下文贡献和持久 job 必须是不同协议。事件 DTO 需要 ID、correlation/causation、scope sequence、隐私等级、顺序和 replay 边界。Sidechain 式 monkey patch 和硬编码私有事件词汇说明缺少 contract，不是我们需要保留的 API。
+观察、动作、拦截、上下文贡献和持久 job 必须是不同协议。事件 DTO 需要 ID、correlation/causation、scope sequence、隐私等级、顺序和 replay 边界。Sidechain 式 monkey patch 和硬编码的私有事件名说明缺少 contract，不是我们需要保留的 API。
 
 ### 3.5 跨 face Bridge
 
-每个双 face 插件都应该获得自动 namespace 的强类型 bridge，而不是自建私有路由：
+每个双 face 插件都应该获得一个自动分配命名空间的强类型 bridge，而不是自建私有路由：
 
 - 小型操作使用 request/response RPC；
 - 进度和实时数据使用有界 stream；
@@ -111,7 +111,7 @@ Broker 可以把它映射到 Cordis、loopback HTTP/WS、IPC 或其他宿主 tra
 - subprocess、shell 环境、PTY、后台 job、进度、进程树取消、平台和原生 ABI 约束；
 - 当前 profile 身份，以及带锁、备份、回滚的插件 install/update/remove/enable/disable/restart 事务。
 
-在 trusted in-process 模式下，这些 API 能改善兼容、授权和审计，但阻止不了恶意代码直接导入 Node API。强制执行需要隔离运行模式。
+在 trusted in-process 模式下，这些 API 能让兼容、授权和审计更可控，但阻止不了恶意代码直接导入 Node API。强制执行需要隔离运行模式。
 
 ## 4. 按真实断点排序
 
@@ -166,7 +166,7 @@ export default definePlugin((ctx) => {
 - 注册项随激活自动释放；
 - fake Host 使用与真实 Host 相同的 schema、取消、生命周期和错误行为；
 - DSH Adapter 翻译到官方 service 和 slot；
-- 无法保持语义时返回带人类说明的 `unsupported`，不默默使用私有 workaround。
+- 无法保持语义时返回附人类可读说明的 `unsupported`，不默默使用私有 workaround。
 
 高级插件可以同时有 Host 入口和隔离 Client view，但它们使用生成的 bridge，不互相 import 实现，也不发明私有 HTTP 路由。
 
@@ -178,4 +178,4 @@ Koishi 和 Chrome 是很好的参考，但真实 DSH 插件能告诉我们理论
 
 > 插件用 Fabric contract 描述并实现自己的意图；宿主拥有位置、授权、生命周期、传输和策略；只有 DSH Adapter 接触与版本相关的上游机制。
 
-这样才能让生态持续演进，同时不虚假承诺所有 UI 都能跨宿主运行，也不把可信 JavaScript 插件假装成已经被 sandbox 隔离。
+这样才能让生态持续演进，同时不虚假承诺所有 UI 都能跨宿主运行，也不假装可信 JavaScript 插件已经被 sandbox 隔离。

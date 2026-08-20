@@ -78,7 +78,7 @@ Error: contract resolution failed: undefined
 - **先协商授权，后执行代码。** discover / validate / negotiate / authorize 全部完成后，才能进入 activating。执行插件代码之前不做完校验和协商，是整个兼容体系的底线。
 - **v0.15 是 generation-scoped eager activation，没有按需激活。** 宿主 ready 后组装一次 runtime generation，把已选中的插件全部激活；执行 command、匹配 subscription 都不能"叫醒"一个 inactive 插件。
 - **正常关闭 best-effort deactivate；崩溃不保证送达。** 你要在正常关闭路径上有界地（带超时）调用每个 activation 的清理，但不要承诺崩溃场景——插件侧被要求把清理设计成幂等的。
-- **HMR / profile 重组会重复激活。** 保持 ready 期间同一插件可能多次 activate/dispose，你的 Broker 归属与资源回收要按 activation instance 记，不能按插件记。
+- **HMR / profile 重组会重复激活。** 宿主处于 ready 期间，同一插件可能多次 activate/dispose，你的 Broker 归属与资源回收要按 activation instance 记，不能按插件记。
 - **每项标准注册都要归属到具体插件 + activation**，维护最小 effect ledger（create / bind / replace / release / cleanup-failed），dispose 时做有界清理。字段见 [spec/lifecycle.md](../spec/lifecycle.md)。
 
 ## 4. 接 conformance 套件
@@ -93,7 +93,7 @@ Error: contract resolution failed: undefined
 
 ## 5. trustMode 公示义务
 
-v0.15 的参考执行档位是 **trusted-in-process**：插件作为**受信任代码**在你的进程里跑。capability 声明用于兼容判断、授权和审计，**它不构成安全沙箱**——阻止不了恶意插件直接 `import` Node API、`process.exit`、死循环。
+v0.15 的参考执行档位是 **trusted-in-process**：插件作为**受信任代码**在你的进程里跑。capability 声明用于兼容判断、授权和审计，**它不构成安全沙箱**——阻止不了恶意插件直接 `import` Node API、调 `process.exit`、写死循环。
 
 所以标准对宿主有一条公示义务：**必须在用户可见的位置显著声明这一事实**，不能把 trusted-in-process 描述或暗示成"隔离""沙箱""安全执行"。诚实声明的参考写法：
 
@@ -103,14 +103,14 @@ v0.15 的参考执行档位是 **trusted-in-process**：插件作为**受信任�
 
 ## 案例：dsh-TUI 认领首个标准兼容宿主
 
-[dsh-TUI](https://github.com/ccch1mneyyy/dsh-TUI) 已在 [community#23 评论 8](https://github.com/omdsh-dev/community/issues/23) 认领首个标准兼容宿主，其公开计划与本清单逐条对应：
+[dsh-TUI](https://github.com/ccch1mneyyy/dsh-TUI) 已在 [community#23 评论 8](https://github.com/omdsh-dev/community/issues/23) 认领"首个标准兼容宿主"的席位，其公开计划与本清单逐条对应：
 
 - **严格 Manifest 校验**：彻底关闭旁路加载，只认静态声明；required 能力缺失（如插件要求图形能力）直接拦截并弹提示，不在运行时静默崩溃；optional 降级运行。
 - **公开宿主能力清单**：随每个版本维护机器可读清单（明确支持的 `session.*`、`storage.local` 及 TUI 子集能力），私有能力统一打 `x-tui.` 前缀，方便市场和启动器静默过滤。
 - **生命周期顺序落地**：TUI 渲染管线本身是事件驱动 + 差分终端输出，已在做第一套标准生命周期实现，保证激活到停用的触发顺序。
 - **联动校验与溯源**：记录插件注册了什么、依赖了什么、修改了什么，支持排查、清理与回滚；构建/布局回归断言将接入社区验证工具 dsh-plugin-verify。
 
-在评论 10 中，T-Auto 进一步表示 TUI 愿意做**第一批参考宿主**，跑完整套验证（Manifest 静态校验 → 能力协商 → 生命周期与事件顺序 → 具体调用时的呈现能力），并提议把 Remote Runtime 的 attach/detach 作为实际验证场景。如果你的产品也想成为早期兼容宿主，按上面五条清单做，然后到 [omdsh-dev/community](https://github.com/omdsh-dev/community) 认领互操作证据（两个宿主 × 三个插件是 v0.15 晋级的标准证据）。
+在评论 10 中，T-Auto 进一步表示 TUI 愿意做**第一批参考宿主**，跑完整套验证（Manifest 静态校验 → 能力协商 → 生命周期与事件顺序 → 具体调用时的呈现能力），并提议把 Remote Runtime 的 attach/detach 作为实际验证场景。如果你的产品也想成为早期兼容宿主，按上面五条清单做，然后到 [omdsh-dev/community](https://github.com/omdsh-dev/community) 提交互操作证据（两个宿主 × 三个插件是 v0.15 晋级所需的标准证据）。
 
 ## 关联
 

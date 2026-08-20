@@ -1,4 +1,4 @@
-# RFC 0002：Runtime、Presentation、Control、Transport 与 Invocation
+# RFC 0002: Runtime、Presentation、Control、Transport 与 Invocation
 
 | 字段 | 内容 |
 | --- | --- |
@@ -20,7 +20,7 @@
 - **Transport** 只传递协议消息，不改变插件语义；
 - **Invocation** 是一个获准 Presentation 对某个 Runtime 发起的一次有边界请求。
 
-Presentation capability 是每次 invocation 的不可变输入，绝不能成为 activation 阶段的全局状态。插件不能依据 `isRemote`、`hostType`、Transport 名称或记住的“当前客户端”分支。同一个 Runtime 可以并发服务多个 Presentation；一个 Presentation 也可以 attach 或切换多个 Runtime，而不改变插件 contract。
+Presentation capability 是每次 invocation 的不可变输入，绝不能成为 activation 阶段的全局状态。插件不能根据 `isRemote`、`hostType`、Transport 名称或记住的“当前客户端”来决定行为分支。同一个 Runtime 可以并发服务多个 Presentation；一个 Presentation 也可以 attach 或切换多个 Runtime，而不改变插件 contract。
 
 ## 1. 状态及与 RFC 0001 的关系
 
@@ -70,13 +70,13 @@ RFC 0001 的 activation 决策也保持不变：实验性 v0.1 **不采用按需
 
 **Runtime** 是插件实际执行的位置及其 trust/resource boundary；一次 Runtime generation 会在其中激活已选中的 plugin entrypoint。它拥有 activation instance、Runtime capability、command handler、storage binding 与业务事件 subscription。
 
-Runtime 不是“UI”，也不由另一台机器认为它是本地还是远端来定义。其 descriptor 可以公开与执行有关的事实，例如操作系统、架构、API version 与 trust mode，但不能向插件公开 `isRemote` 这种捷径。
+Runtime 不是“UI”，也不按“在别的机器看来它是本地还是远端”来定义。其 descriptor 可以公开与执行有关的事实，例如操作系统、架构、API version 与 trust mode，但不能向插件公开 `isRemote` 这种捷径。
 
 ### 5.2 Presentation
 
-**Presentation** 是某次 invocation 可用的用户交互界面。Presentation endpoint 可以持续 attached，并负责发现 command、收集输入、呈现输出或提供短期交互 affordance，但其 capability 只有通过 invocation snapshot 才对插件有意义。桌面窗口、browser client、TUI、CLI 与确定性的 headless test client 都可以是 Presentation。
+**Presentation** 是某次 invocation 可用的用户交互界面。Presentation endpoint 可以长期保持 attached（连接）状态，并负责发现 command、收集输入、呈现输出或提供短期交互 affordance，但其 capability 只有通过 invocation snapshot 才对插件有意义。桌面窗口、browser client、TUI、CLI 与确定性的 headless test client 都可以是 Presentation。
 
-Presentation 声明带版本的 capability，而不是供插件分支的产品标签。插件只能在协商后的 capability 中选择。产品身份可以用于诊断和一致性证据，但 `hostType`、`clientType` 或产品名不能代替 capability 检查。
+Presentation 声明带版本的 capability，而不是供插件做分支判断的产品标签。插件只能在协商后的 capability 中选择。产品身份可以用于诊断和一致性证据，但 `hostType`、`clientType` 或产品名不能代替 capability 检查。
 
 ### 5.3 Control
 
@@ -101,7 +101,7 @@ Transport 会影响连接、延迟、framing 与故障信号，但不能改变 c
 3. Runtime 与插件都不能保存全局 `currentPresentation`、`hostType` 或 `isRemote` 供后续请求使用。
 4. 一个 attachment 声明的 capability 绝不能泄漏到另一个 attachment 或 invocation。
 5. Transport 可以转发标准 envelope，但不能重新解释其业务语义。
-6. Control 对 attachment identity、grant、deadline 与 revoke 具有权威性；仅凭不受信客户端的声明不够。
+6. attachment identity、grant、deadline 与 revoke 一律以 Control 的裁定为准；仅凭不受信客户端的声明不算数。
 7. Invocation 指向不可变的 `runtimeId` 与 `generationId`；重连或切换不能静默改变目标。
 8. Attach、detach、command discovery 与 invocation 都不会按需激活插件。
 
@@ -497,7 +497,7 @@ Tooling 应从 command input/output schema 生成 TypeScript type，提供 fake 
 9. 插件代码执行前的 authorization denial、跨 attachment 隔离、grant revoke 与已裁剪 provenance report。
 10. 零 capability 的 headless Presentation 得到 typed unavailable，而不是 crash 或尝试打开 browser。
 
-通过 in-memory 测试不能证明 SSH 或 WebSocket adapter。每个 adapter 都要针对同一 semantic suite 发布自身带版本的 Transport 证据。
+通过 in-memory 测试不能证明 SSH 或 WebSocket adapter 达标。每个 adapter 都要针对同一 semantic suite 发布自身带版本的 Transport 证据。
 
 ## 16. Remote SSH 一致性矩阵
 
@@ -560,7 +560,7 @@ Remote SSH 是第一个必须验证的端到端反例，但不是享有特权的
 7. Reconnect 能否安全恢复 attachment，还是 v0 必须始终新建？
 8. 在不形成跨设备跟踪 ID 的前提下，最少可以保留哪些 provenance？
 9. Attachment 处于 draining 时如何处理 capability downgrade？
-10. 哪些 Control 职责必须集中在一个 trust authority，哪些可以 federation？
+10. 哪些 Control 职责必须集中在一个 trust authority，哪些可以做 federation（联邦化）？
 
 ## 19. 参考资料与讨论输入
 

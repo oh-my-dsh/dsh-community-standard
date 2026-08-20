@@ -17,7 +17,7 @@
 ## 1. 适用范围
 
 - 本文规范 **Host-side `host` facet** 的生命周期：宿主产品自身的状态流转，以及每个插件 entrypoint 的每一次 activation instance 的状态流转。
-- 本文**不**规范 `client` / `worker` face 的生命周期与跨 face 通信（归 [RFC 0002](../rfcs/0002-runtime-presentation.md)）。
+- 本文**不**规范 `client` / `worker` facet 的生命周期与跨 facet 通信（归 [RFC 0002](../rfcs/0002-runtime-presentation.md)）。
 - 协商与授权的内部判定规则见 [negotiation.md](negotiation.md)；本文只规定它们在状态机中的**位置与顺序**。
 
 ## 2. 规范性定义
@@ -98,7 +98,7 @@ discover → validate → negotiate → authorize
 
 ### 2.6 最小 effect ledger
 
-Broker **必须**维护机器可读的最小 effect ledger：append-only、不可修改的转移记录。本文只定义 v0.15 最小版；完整版（物化视图、恢复扫描、observer metadata、保留策略）见 [RFC 0004](../rfcs/0004-provenance-diagnostics.md) §8–§9，不在此复述。
+Broker **必须**维护机器可读的最小 effect ledger：append-only、不可修改的流水记录。本文只定义 v0.15 最小版；完整版（物化视图、恢复扫描、observer metadata、保留策略）见 [RFC 0004](../rfcs/0004-provenance-diagnostics.md) §8–§9，不在此复述。
 
 每条记录**必须**包含（字段名为示意，以 Registry 定案为准）：
 

@@ -133,7 +133,7 @@ RFC 模板：元信息表（状态 / 目标版本 / 范围 / 依赖 / 讨论方�
 
 ### spec/event-envelope.md — P0
 
-事件信封与 `messages.observe`。信封字段（envelopeVersion、eventType/Version、eventId、scopeType/Id/Sequence、correlationId、privacyClass、redactions、payloadSchema、不可变 payload）；payload 对齐 MCP `ContentBlock` 的精确字段边界——**这是 §9 征求意见第 3 问的落点，初稿标注"待社区反馈冻结"**；scope 内顺序保证与不隐含全局顺序；`before-*` 不进 v0.15 的引用性说明（指向 0002 前置条件清单）。
+事件信封与 `messages.observe`。信封字段（envelopeVersion、eventType/Version、eventId、scopeType/Id/Sequence、correlationId、privacyClass、redactions、payloadSchema、不可变 payload）；payload 对齐 MCP `ContentBlock` 的精确字段边界——**这是 §9 征求意见第 3 问的落点，初稿标注"待社区反馈冻结"**；scope 内顺序保证与不隐含全局顺序；以及一条说明 `before-*` 不进 v0.15 的备注（只指向 0002 前置条件清单，不下定义）。
 
 ### spec/facet-model.md — P1
 

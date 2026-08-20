@@ -24,7 +24,7 @@
 
 ## payload 与 MCP `ContentBlock` 对齐（**待社区反馈冻结**）
 
-`payload.content` 对齐 [MCP `ContentBlock`](https://modelcontextprotocol.io/specification/2026-07-28/schema#contentblock) 的精确字段边界——哪些字段进信封、哪些裁剪、`privacyClass` 怎么分级——是本轮征求意见点（v0.15 §9 第 3 问，morlay 提出，处置见 [decisions/round-2-issue-24.md](../../decisions/round-2-issue-24.md)）。初稿提议与待答问题见 [spec/event-envelope.md](../../spec/event-envelope.md) §3.2，本条目不复述。**冻结前不得把任何字段取值当作稳定契约传播。**
+`payload.content` 要对齐 [MCP `ContentBlock`](https://modelcontextprotocol.io/specification/2026-07-28/schema#contentblock)，但精确到哪些字段进信封、哪些裁剪、`privacyClass` 怎么分级，是本轮征求意见点（v0.15 §9 第 3 问，morlay 提出，处置见 [decisions/round-2-issue-24.md](../../decisions/round-2-issue-24.md)）。初稿提议与待答问题见 [spec/event-envelope.md](../../spec/event-envelope.md) §3.2，本条目不复述。**冻结前不得把任何字段取值当作稳定契约传播。**
 
 ## 用法示例
 

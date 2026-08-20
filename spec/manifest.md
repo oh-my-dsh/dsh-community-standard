@@ -158,7 +158,7 @@ manifest 里有五种声明。它们写在同一个文件里，但语义互相�
 | `contributes` 内 `id` 重复 | 拒绝加载 | `invalid/duplicate-contributes-id.json` |
 | 跨插件 `contributes.id` 冲突 | 安装前拒装，报告"冲突，不能共存" | suites 冲突场景 |
 | entry 路径越出包根目录 | 拒绝加载 | `invalid/entry-outside-root.json` |
-| manifest 不是静态 JSON / 需运行代码生成 | 不参与标准管理加载 | suites 发现阶段断言 |
+| manifest 不是静态 JSON / 需运行代码生成 | 不纳入标准管理的加载流程 | suites 发现阶段断言 |
 | 断网环境下校验 | 必须照常工作（不联网取 schema） | suites 离线环境断言 |
 
 ## 6. 对应 fixtures 清单
@@ -178,7 +178,7 @@ fixtures 由后续任务创建，路径约定如下（非法样本一个文件�
 - `conformance/fixtures/manifest/invalid/duplicate-contributes-id.json`
 - `conformance/fixtures/manifest/invalid/entry-outside-root.json`
 
-两个特殊样本：`duplicate-contributes-id.json`（按 `id` 去重是跨元素语义）与 `entry-outside-root.json`（"位于根目录内"是文件系统语义）**无法由 JSON Schema 表达**——它们能通过 schema 校验，但必须被校验器在 schema 之外的静态检查拒绝（约定见 [conformance/fixtures/README.md](../conformance/fixtures/README.md)）。
+两个特殊样本：`duplicate-contributes-id.json`（按 `id` 去重是跨元素语义）与 `entry-outside-root.json`（"位于根目录内"是文件系统语义）**无法由 JSON Schema 表达**——它们能通过 schema 校验，但校验器必须通过 schema 之外的静态检查拒绝它们（约定见 [conformance/fixtures/README.md](../conformance/fixtures/README.md)）。
 
 ## 7. 变更记录
 

@@ -72,7 +72,7 @@ v0.15 的契约坐标一共就这三条，全部在 [registry/](../registry/READ
 
 `requires.contracts` 里每一项是一条 registry 精确条目（`apiVersion + kind`），默认是 **required**：
 
-- **required 缺一个，宿主直接拒载**，并在拒载提示里告诉用户缺什么。这是feature不是bug：宁可装不上，不要装上炸。
+- **required 缺一个，宿主直接拒载**，并在拒载提示里告诉用户缺什么。**这是 feature，不是 bug**：宁可装不上，不要装上炸。
 - **optional** 加 `"optional": true`：宿主没有这条能力时插件照常激活，但对应 API 不存在，你的代码必须自己走降级路径：
 
 ```json
@@ -88,7 +88,7 @@ if (activation.capabilities.messages) {
 }
 ```
 
-经验法则：**没有它你的核心功能就不成立的，写 required；没有它只是少个锦上添花功能的，写 optional 并认真写降级分支。**
+经验法则：**没有它你的核心功能就不成立的，写 required；没有它只是少了个锦上添花的功能，写 optional，并认真配好降级分支。**
 
 ## 3. 用 `defineFacet` 写一个 command
 

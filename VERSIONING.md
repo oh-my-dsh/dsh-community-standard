@@ -39,11 +39,11 @@ v0.15 首批三个坐标（权威定义在 Registry 条目里，此处只做索�
 
 - **坐标是 opaque 的。** 工具不得从坐标字符串里解析出 `dsh` 之类的段并自行推断语义；语义一律以 Registry 条目为准。
 - **名称只在 Registry 登记。** 实现方不得从 RFC 正文或源码里自行发明"等价"名称；manifest 与 Host Descriptor 只能引用 Registry 精确条目。登记流程见 [RFC 0000](rfcs/0000-governance.md) 与 [registry/README.md](registry/README.md)。
-- **契约独立版本化是有意为之。** Model Provider、工具渐进式披露等领域被上游模型生态推着跑，演进极快，中心化的固定 SDK 扛不住。某领域契约升级时，只有那份契约和用它的插件需要动，内核、无关插件和宿主都不用重新发版。已有独立探索实现验证：[Yan-Zero/dsh-std](https://github.com/Yan-Zero/dsh-std)。（历史注脚：v0.1 阶段契约版本曾暂时跟随统一 `apiVersion`，v0.15 起转为随坐标独立演进。）
+- **契约独立版本化是有意为之。** Model Provider、工具渐进式披露等领域被上游模型生态推着跑，演进极快，中心化的固定 SDK 扛不住。某领域契约升级时，只有那份契约和用它的插件需要动，内核、无关插件和宿主都不用重新发版。这条路线已有独立探索实现验证过：[Yan-Zero/dsh-std](https://github.com/Yan-Zero/dsh-std)。（历史注脚：v0.1 阶段契约版本曾暂时跟随统一 `apiVersion`，v0.15 起转为随坐标独立演进。）
 
 ## 3. `v1alpha1` 与 `0.x` 的语义
 
-- **`v1alpha1` 是实验期坐标：可能 breaking，不作任何稳定性承诺。** alpha 语义必须讲清楚：它不是"稳定 1.0 的第一个小版本"，升级路径是发布新坐标（`v1alpha2` → `v1beta1` → `v1`），而不是在旧坐标上原地修。
+- **`v1alpha1` 是实验期坐标：可能 breaking，不作任何稳定性承诺。** 这里把 alpha 语义讲清楚：它不是"稳定 1.0 的第一个小版本"，升级路径是发布新坐标（`v1alpha2` → `v1beta1` → `v1`），而不是在旧坐标上原地修。
 - **`manifestVersion: "0.x"` 同理**：v0 阶段按"**minor 可能 breaking**"的实验规则明确标注——`0.15` → `0.16` 可以调整 manifest 结构，不伪装成稳定 `1.x`。
 - 任何文档、工具或市场页面不得把 alpha / 0.x 版本展示成"稳定版"。
 
@@ -65,4 +65,4 @@ v0.15 首批三个坐标（权威定义在 Registry 条目里，此处只做索�
 ### 5.2 官方保留命名空间
 
 - Registry 为 dsh 官方保留一组命名空间，社区条目不得占用；未来官方能力可直接以一等身份入驻。保留清单见 [registry/README.md](registry/README.md)。
-- `dsh-plugin.json` 文件名与 `dsh-*` 命名前缀已向官方发出不冲突确认请求（见 [RFC 0001](rfcs/0001-core-contract.md) §7.2）；确认结果会按反馈链路登记到 `decisions/` 处置记录。
+- 我们已就 `dsh-plugin.json` 文件名与 `dsh-*` 命名前缀向官方发出不冲突确认请求（见 [RFC 0001](rfcs/0001-core-contract.md) §7.2）；确认结果会按反馈链路登记到 `decisions/` 处置记录。

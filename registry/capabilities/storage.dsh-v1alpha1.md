@@ -19,7 +19,7 @@
 | --- | --- | --- |
 | 跨插件共享存储 | 共享本质是插件间组合问题，需要先定义 provider cardinality、选择与冲突规则 | [RFC 0003](../../rfcs/0003-service-composition.md)（v0.15 §4.2） |
 
-多 scope storage、Secret 能力同属延期主题，各有独立 RFC 后再议。
+多 scope storage、Secret 能力同属延期主题，等各自有了独立 RFC 再议。
 
 ## 用法示例
 

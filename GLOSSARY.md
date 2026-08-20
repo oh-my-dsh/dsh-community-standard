@@ -38,8 +38,8 @@
 
 ## 信任与验证
 
-> **trusted-in-process（进程内受信任）**：v0.15 唯一的执行档位——插件和宿主跑在同一进程里，技术上插件可以绕过标准接口直接调用系统能力。所以能力声明的作用是兼容判断、授权和审计，**不是安全沙箱**，宿主必须向用户显著公示这一点。规范定义见 [rfcs/0001-core-contract.md](rfcs/0001-core-contract.md) 原则 ④。
+> **trusted-in-process（进程内受信任）**：v0.15 唯一的执行档位——插件和宿主跑在同一进程里，技术上插件可以绕过标准接口直接调用系统能力。所以能力声明的作用是兼容判断、授权和审计，**不是安全沙箱**，宿主必须以显著方式向用户公示这一点。规范定义见 [rfcs/0001-core-contract.md](rfcs/0001-core-contract.md) 原则 ④。
 
 > **effect ledger（效果台账）**：Broker 记的流水账——哪个插件的哪次激活创建、绑定、替换、释放了哪项资源，清理失败也记一笔。用来回答"这东西是谁干的、收拾干净没有"。最小记录字段见 [spec/lifecycle.md](spec/lifecycle.md)，完整版见 [rfcs/0004-provenance-diagnostics.md](rfcs/0004-provenance-diagnostics.md)。
 
-> **conformance（一致性）**：一套"说到做到"的验证——宿主跑通一致性测试套件、插件通过校验、再拿出多宿主多插件的互操作证据。通过一致性只证明行为符合标准文本，**不代表"安全"，更不代表"官方认证"**。规范定义见 [spec/conformance.md](spec/conformance.md)。
+> **conformance（一致性）**：一套"说到做到"的验证——宿主跑通一致性测试套件、插件通过校验、双方再拿出多宿主多插件的互操作证据。通过一致性只证明行为符合标准文本，**不代表"安全"，更不代表"官方认证"**。规范定义见 [spec/conformance.md](spec/conformance.md)。

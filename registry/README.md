@@ -2,7 +2,7 @@
 
 > **状态：Draft v0.15（社区讨论稿，非官方标准）**
 
-这份文件管什么：说明本目录（契约注册表）的条目怎么读、怎么写、怎么新增和变更。谁该读：所有实现方——**契约的名字和版本以这里的条目为唯一权威**，不许从 RFC 或 spec 正文里自行发明"等价"名称；以及想登记新契约的人。
+这份文件管什么：说明本目录（契约注册表）的条目怎么读、怎么写、怎么新增和变更。谁该读：所有实现方，以及想登记新契约的人。对实现方特别强调：**契约的名字和版本以这里的条目为唯一权威**，不许从 RFC 或 spec 正文里自行发明"等价"名称。
 
 ## 1. 条目格式
 
@@ -13,7 +13,7 @@ capabilities/commands.dsh-v1alpha1.json   # 机器可读条目
 capabilities/commands.dsh-v1alpha1.md     # 人话说明
 ```
 
-capability 条目放 `capabilities/`，event 条目放 `events/`。文件主名 = 坐标中的 `apiVersion` 部分把 `/` 换成 `-`（如 `commands.dsh/v1alpha1` → `commands.dsh-v1alpha1`）。
+capability 条目放 `capabilities/`，event 条目放 `events/`。文件主名 = 把坐标中 `apiVersion` 部分的 `/` 换成 `-`（如 `commands.dsh/v1alpha1` → `commands.dsh-v1alpha1`）。
 
 ### 1.1 JSON 字段
 
@@ -39,7 +39,7 @@ capability 条目放 `capabilities/`，event 条目放 `events/`。文件主名 
 
 - 契约坐标 = `apiVersion + kind`，如 `commands.dsh/v1alpha1` + `Command`。
 - `v1alpha1` 的语义（实验期、可能 breaking、不伪装稳定 `1.x`）与 breaking change / 弃用窗口规则见 [VERSIONING.md](../VERSIONING.md)，本文件不重复。
-- Host Descriptor 与 manifest 只能引用本 Registry 中存在的**精确条目**，不能用产品本地别名替代（宿主义务见 [rfcs/0001-core-contract.md](../rfcs/0001-core-contract.md)）。
+- Host Descriptor 与 manifest 只能引用本 Registry 中存在的**精确条目**，不能用宿主产品自己起的本地别名代替（宿主义务见 [rfcs/0001-core-contract.md](../rfcs/0001-core-contract.md)）。
 
 ## 3. 登记与变更流程
 

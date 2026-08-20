@@ -1,4 +1,4 @@
-# RFC 0004：溯源、验证、诊断与 Effect Ledger
+# RFC 0004: 溯源、验证、诊断与 Effect Ledger
 
 | 字段 | 内容 |
 | --- | --- |
@@ -11,7 +11,7 @@
 
 ## 0. 一句话摘要
 
-Fabric 必须能在不猜测的情况下回答四个问题：
+Fabric 必须能不靠猜测回答四个问题：
 
 1. 这个插件声称会添加或修改什么？
 2. Host 实际允许并激活了什么？
@@ -22,7 +22,7 @@ Fabric 必须能在不猜测的情况下回答四个问题：
 
 ## 1. 背景
 
-Manifest 校验只能证明 JSON 结构符合预期。目录收录也只能证明某个来源提供了元数据。二者都无法解释 package script、native dependency、授权、共享 service 冲突、运行时注册或清理结果。
+Manifest 校验只能证明 JSON 结构符合预期。市场收录也只能证明某个来源提供了元数据。二者都无法解释 package script、native dependency、授权、共享 service 冲突、运行时注册或清理结果。
 
 社区在[这条评论](https://github.com/omdsh-dev/community/issues/23#issuecomment-5305656025)中明确区分了安装前影响预览和运行时溯源。验证工具相关讨论也在[这条评论](https://github.com/omdsh-dev/community/issues/23#issuecomment-5306132230)中提出统一机器可读报告，而不是让每个 Host 输出自己的自然语言。
 
@@ -40,12 +40,12 @@ RFC 0001 已要求 activation-scoped ownership，以及 v0.1 中最小的 append
 
 ## 3. 非目标
 
-- 定义通用恶意代码扫描器，或把通过报告称为“安全”。
-- 替代代码签名、沙箱、操作系统策略或人工审核。
-- 在本 RFC 中统一所有包管理器和 lockfile。
-- 把目录热度、stars、publisher claim 或合作来源当成验证。
-- 仅因为声明了 legacy effect 就获得 patch 私有代码的权限。
-- 要求报告包含原始消息、credential、本地路径或环境变量。
+- 不定义通用恶意代码扫描器，也不把通过报告称为“安全”。
+- 不替代代码签名、沙箱、操作系统策略或人工审核。
+- 不在本 RFC 中统一所有包管理器和 lockfile。
+- 不把目录热度、stars、publisher claim 或合作来源当成验证。
+- 不仅因为声明了 legacy effect 就获得 patch 私有代码的权限。
+- 不要求报告包含原始消息、credential、本地路径或环境变量。
 
 ## 4. 证据类型
 
@@ -77,7 +77,7 @@ Artifact digest 改变后，旧报告不再适用。Host 可以展示相关历�
 
 ## 6. 安装影响报告
 
-安装影响报告在安装确认前生成，输入包括 manifest、package metadata、已解析依赖计划和 Host policy。它不包含目录提供的可执行命令。
+安装影响报告在安装确认前生成，输入包括 manifest、package metadata、已解析依赖计划和 Host policy。它不包含市场（catalog）提供的可执行命令。
 
 至少记录：
 
@@ -247,9 +247,9 @@ artifact → manifest → negotiation/grant → activation
 
 ## 14. 与其他工作的关系
 
-- [RFC 0001](0001-core-contract.md) 管理 manifest、协商、生命周期和基础 activation ownership。
-- [RFC 0003](0003-service-composition.md)管理 service-provider 冲突与替换策略；本 RFC 只把最终 runtime transition 记录为 observed effect，decision 仍留在 Composition Plan。
-- [RFC 0002](0002-runtime-presentation.md)管理 invocation 与 Runtime/Presentation identity；本 RFC 记录不透明 identity 和脱敏结果。
+- [RFC 0001](0001-core-contract.md) 规定 manifest、协商、生命周期和基础 activation ownership。
+- [RFC 0003](0003-service-composition.md)规定 service-provider 冲突与替换策略；本 RFC 只把最终 runtime transition 记录为 observed effect，decision 仍留在 Composition Plan。
+- [RFC 0002](0002-runtime-presentation.md)规定 invocation 与 Runtime/Presentation identity；本 RFC 记录不透明 identity 和脱敏结果。
 - [DSH 插件需求调研](../research/dsh-plugin-needs.md)包含 private route、UI 注册、process、package operation 和 monkey patch 等需要 ownership 的真实例子。
 - [DSH Community Market](https://github.com/anywhere-labs/deepseek-harness-desktop/blob/master/dsh-community-market/README.zh.md)可以展示报告，但不能自行创建或提升其 trust class。
 

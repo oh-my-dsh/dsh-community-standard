@@ -17,7 +17,7 @@ Issue #23 是很有价值的设计输入，但还不是已经通过的社区标�
 3. 兼容性需要机器可读验证和运行时 ownership 证据；
 4. 从私有 patch 迁移需要 Adapter 策略，但不能把 patch 变成公共插件 API。
 
-Fabric 文档现在通过强化后的 [RFC 0001](../rfcs/0001-core-contract.md)和三份聚焦的后续 Draft 吸收这些意见：
+Fabric 文档现在通过强化后的 [RFC 0001](../rfcs/0001-core-contract.md)和三份各有侧重的后续 Draft 吸收这些意见：
 
 - [RFC 0002：Runtime、Presentation、Control、Transport 与 Invocation](../rfcs/0002-runtime-presentation.md)；
 - [RFC 0003：Service Provider 与组合规则](../rfcs/0003-service-composition.md)；
@@ -64,11 +64,11 @@ Fabric v0.1 在协商后执行 generation-scoped eager activation。按需激活
 
 ### 3.2 v0.1 不开放可修改的 `before-*` 事件
 
-第一种事件只允许不可修改的观察。修改或取消 hook 必须定义参与者顺序、冲突规则、deadline、backpressure、错误隔离、replay、payload privacy 与审计记录。给普通 listener 加上 `before` 名字并不能解决这些要求。
+第一种事件只允许不可修改的观察。修改或取消 hook 必须定义参与者顺序、冲突规则、deadline、backpressure、错误隔离、replay、payload privacy 与审计记录。给普通 listener 加上 `before` 前缀并不能满足这些要求。
 
 ### 3.3 Capability 声明不是沙箱
 
-同进程内受信任的 Node.js 插件可以绕过提供的 context，直接 import 操作系统模块。Fabric 可以在自己的 API 边界校验、协商、记录和拒绝不支持的调用；只有使用受管 import 与 IPC 的隔离执行档位，才能声称技术强制。
+同进程内受信任的 Node.js 插件可以绕过提供的 context，直接 import 操作系统模块。Fabric 可以在自己的 API 边界校验、协商、记录和拒绝不支持的调用；只有使用受管 import 与 IPC 的隔离执行档位，才能声称实现了技术强制。
 
 ### 3.4 Legacy 兼容由 Adapter 负责
 
@@ -80,7 +80,7 @@ Fabric 可以禁止 Fabric-managed plugin 绕过标准加载，但不能声称�
 
 ## 4. 下一步应该实现什么
 
-下一轮实现应继续小于完整愿景，并明确分开 v0.1 关键路径与后续实验。
+下一轮实现的范围仍应小于完整愿景，并明确分开 v0.1 关键路径与后续实验。
 
 ### 4.1 实验性 v0.1 关键路径
 
@@ -95,7 +95,7 @@ v0.1 negotiator 只覆盖 RFC 0001 实际支持的 Host capability 和声明，�
 
 ### 4.2 并行与 v0.1 之后的探索
 
-- RFC 0002 可以用一个 Runtime 同时连接两个 Presentation descriptor，确保 Remote SSH 假设会在测试中显式失败。
+- RFC 0002 可以用一个 Runtime 同时连接两个 Presentation descriptor，确保 Remote SSH 的假设一旦不成立，就会在测试中显式暴露。
 - RFC 0003 可以先实现纯静态 service-composition planner，再考虑任何 runtime Provider binding。
 - RFC 0004 可以在规范 v0.1 transition ledger 之上验证安装报告和物化诊断。
 - TUI、Web UI 与 Desktop 都可以贡献证据，但任何单一产品都不会成为标准本身。
@@ -104,4 +104,4 @@ UI 渲染语言、强沙箱、package distribution、市场签名证明、可修
 
 ## 5. 这份记录如何更新
 
-这是对链接 Issue 快照的日期化审查。新评论不会静默改写 Draft。重要变化应先通过审查更新对应 RFC，再在本记录中补充评论链接、处置和受影响 contract。
+本文是对所链接 Issue 的一次审查，以其快照日期时的状态为准。新评论不会静默改写 Draft。重要变化应先通过审查更新对应 RFC，再在本记录中补充评论链接、处置和受影响 contract。

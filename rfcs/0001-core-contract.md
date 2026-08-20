@@ -113,7 +113,7 @@ capability 要区分四件事：**support**（宿主声明能提供）、**reque
 决定如下，**规范见 [spec/lifecycle.md](../spec/lifecycle.md) 与 [spec/event-envelope.md](../spec/event-envelope.md)**：
 
 - 宿主状态机（`starting → ready → stopping → stopped`）与插件 activation 状态机（`discover → validate → negotiate → authorize → activating → active → deactivating → disposed`）是两套独立状态机。
-- v0.15 采用 generation-scoped **eager activation，无按需激活**（理由见 §6.3）。正常关闭 best-effort deactivate；崩溃、断电、强杀时不保证送达，插件清理必须设计为可重复。
+- v0.15 采用 generation-scoped **eager activation，无按需激活**（理由见 §6.3）。正常关闭时 best-effort 地 deactivate；崩溃、断电、强杀时不保证 deactivate 调用送达，插件清理必须设计为可重复。
 - 事件使用带版本的最小信封：scope 内单调递增序号、scope 内有序，不隐含跨 scope 全局顺序；payload 不可修改，携带敏感级别与裁剪摘要。信封的逐字段规范见 [spec/event-envelope.md](../spec/event-envelope.md)，本文不重复。payload 对齐 MCP `ContentBlock` 的精确字段边界**正在征求意见**（§9 第 3 问）。
 - 可修改 / 可取消的 `before-*` 事件不进 v0.15（理由见 §6.4）。
 

@@ -13,7 +13,7 @@
 - **你交出**：对宿主内部实现的所有假设（内部函数、内部事件名、加载顺序）；
 - **你得到**：dsh 上游更新不再批量炸你的插件；装上之前宿主就能判断兼容性；多个插件共存时不再"谁后加载谁赢"。
 
-代价是有些野路子**暂时没有标准对应物**——本文 §3 诚实列出，别闷头迁到一半才发现核心功能落不了地。
+代价是有些野路子**暂时没有标准对应物**——本文的诚实清单（见下文）逐条列出，别闷头迁到一半才发现核心功能落不了地。
 
 ## 第一步：识别 patch 点
 
@@ -36,7 +36,7 @@
 
 ## 第二步：映射到标准契约
 
-每个 patch 点查这张表。**左边是你现在的做法，右边是 v0.15 的标准路径；右边写"暂无"的，去 §3 看怎么办。**
+每个 patch 点查这张表。**左边是你现在的做法，右边是 v0.15 的标准路径；右边写"暂无"的，去下面的诚实清单看怎么办。**
 
 | 现在的做法 | v0.15 标准路径 |
 | --- | --- |
@@ -44,11 +44,11 @@
 | `ctx.get()` / 反射探测内部服务 | manifest `requires.contracts` 静态声明，协商后由宿主注入；探测本身就是要消灭的东西 |
 | 往宿主目录写配置 / 存状态 | `storage.dsh/v1alpha1`（LocalStorage），插件私有、宿主管理 |
 | patch UI / 内部函数注册命令 | `commands.dsh/v1alpha1`（Command，flat action leaf）+ manifest `contributes.commands` 声明 |
-| patch 宿主源码**修改行为**（拦截发送、改消息、改 settlement） | **暂无**——`before-*` 可修改事件延期，见 §3 |
-| 注册搜索 / 模型 / 工具 provider，插件间互相调用 | **暂无**——`provides` 延期（RFC 0003），见 §3 |
-| 自定义 UI 面板、富视图、slot、主题 | **暂无**——跨端声明式 UI 整体延期（RFC 0002），见 §3 |
-| 自建 loopback HTTP/WS 做 Host↔Client 通信 | **暂无**——跨 face bridge 归 RFC 0002，见 §3 |
-| 联网请求、读写任意文件、起子进程 / PTY | **暂无**——敏感能力各自需要独立 RFC，见 §3 |
+| patch 宿主源码**修改行为**（拦截发送、改消息、改 settlement） | **暂无**——`before-*` 可修改事件延期，见诚实清单 |
+| 注册搜索 / 模型 / 工具 provider，插件间互相调用 | **暂无**——`provides` 延期（RFC 0003），见诚实清单 |
+| 自定义 UI 面板、富视图、slot、主题 | **暂无**——跨端声明式 UI 整体延期（RFC 0002），见诚实清单 |
+| 自建 loopback HTTP/WS 做 Host↔Client 通信 | **暂无**——跨 face bridge 归 RFC 0002，见诚实清单 |
+| 联网请求、读写任意文件、起子进程 / PTY | **暂无**——敏感能力各自需要独立 RFC，见诚实清单 |
 
 契约坐标的权威来源是 [registry/](../registry/README.md)，每个条目有机器可读 JSON + 人话说明（如 [commands.dsh-v1alpha1](../registry/capabilities/commands.dsh-v1alpha1.md)）。**逐条核对语义再映射**——比如 v0.15 的 command 只是 flat action leaf，你原来的命令带子命令树的话，子命令部分落在 RFC 0002 的范围，不要硬塞进一个 handler 里自己解析。
 
@@ -77,13 +77,13 @@ npx dsh-plugin-verify ./dsh-plugin.json
 
 对照[插件作者指南 §6 的报错对照表](plugin-author.md#6-常见拒载报错对照表)修到没有拒载项为止。之后按插件 validation 的要求自测：重复 activate/dispose 后资源能释放、optional 缺失时降级路径真的走通、错误信息人看得懂（[spec/conformance.md](../spec/conformance.md)）。
 
-## 3. 这些野路子暂时没有标准对应物（诚实清单）
+## 这些野路子暂时没有标准对应物（诚实清单）
 
 迁移前逐条确认你的插件不依赖以下能力。依赖了，你就得选：等对应 RFC、只支持保留了 legacy 路径的宿主、或砍掉该功能。
 
 | 野路子 | 状态 | 去向 |
 | --- | --- | --- |
-| 修改 / 拦截消息与行为（before-send 类可取消可修改事件） | 延期，未进 v0.15 | [RFC 0002](../rfcs/0002-runtime-presentation.md) 前置条件清单：多插件顺序、修改合并、cancel 语义、timeout、回滚、隐私裁剪全部要有答案才会开 |
+| 修改 / 拦截消息与行为（before-send 类可取消可修改事件） | 延期，未进 v0.15 | [RFC 0002](../rfcs/0002-runtime-presentation.md) 前置条件清单：多插件顺序、修改合并、cancel 语义、timeout、回滚、隐私裁剪全部有答案了，这条能力才会开放。 |
 | 插件间互相调用、注册 provider（搜索/模型/工具）、依赖"能力"而非具体插件 | 延期，v0.15 schema 直接拒绝 `provides` / `requires.services` | [RFC 0003](../rfcs/0003-service-composition.md)——下一阶段最高优先级，community#24 评论 2 也明确要求它保持高优先级 |
 | 自定义 UI 面板 / 富视图 / 主题 / command tree / 交互式 prompt / 短期呈现通道（device code、二维码、确认请求） | 延期 | [RFC 0002](../rfcs/0002-runtime-presentation.md)（跨端声明式 UI 与 Runtime / Presentation 分层整体延期） |
 | Host ↔ Client 跨 face 强类型 bridge（替代自建 loopback RPC） | 延期 | [RFC 0002](../rfcs/0002-runtime-presentation.md) |
@@ -92,7 +92,7 @@ npx dsh-plugin-verify ./dsh-plugin.json
 
 这个清单不是"永远不做"，是"按 RFC 流程做"。如果你的插件卡在某一格，最有效的动作是去对应 RFC 的讨论里贴出你的真实用法——v0.15 的很多设计就是这么被社区反例推出来的。
 
-## 4. 迁移期与 legacy 路径共存的边界
+## 迁移期与 legacy 路径共存的边界
 
 标准**不要求**宿主删除内置、legacy 或非标准插件路径。迁移期的边界是这样划的：
 
@@ -101,7 +101,7 @@ npx dsh-plugin-verify ./dsh-plugin.json
 - **不能骑墙**：宿主不能对无法等价映射的能力"偷偷用内部接口近似"然后宣称支持；插件不能一边拿标准契约、一边继续 patch 同一个行为。legacy 路径上的行为不算标准兼容。
 - **一个包可以两条腿走路**：迁移期你的包可以同时携带旧入口（服务 legacy 宿主）和 `dsh-plugin.json`（服务标准宿主），两边独立演进；但对标准宿主，manifest 里声明的必须是完整的真实需求。
 
-一句话：**标准管标准插件，legacy 管 legacy 插件，谁也不假装是谁。** 等 RFC 0002/0003/0004 逐一落地，§3 清单里的格子会逐个收编，legacy 存在的理由也随之减少。
+一句话：**标准管标准插件，legacy 管 legacy 插件，谁也不假装是谁。** 等 RFC 0002/0003/0004 逐一落地，诚实清单里的格子会被逐个收编，legacy 存在的理由也随之减少。
 
 ## 关联
 

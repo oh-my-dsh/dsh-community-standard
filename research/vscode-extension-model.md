@@ -48,7 +48,7 @@ Extension Host
 - `extensionDependencies` 与 `extensionPack`：功能依赖和组合安装；
 - `capabilities.untrustedWorkspaces` 与 `virtualWorkspaces`：受限环境中的支持程度。
 
-这使市场和 Host 可以在不执行扩展代码时理解它的大部分外观和运行要求。
+这使市场和 Host 可以在不执行扩展代码的情况下，了解它的大部分能力和运行要求。
 
 ### 2.2 静态 Contribution Points
 
@@ -152,7 +152,7 @@ Host 支持 capability
 
 ### 2.9 版本、实验 API 与工具链
 
-VS Code 对稳定 Extension API 尽力保持向后兼容。不稳定 Proposed API 只能在 Insiders/开发环境中显式启用，不能作为普通 Marketplace 扩展依赖。
+VS Code 对稳定 Extension API 尽力保持向后兼容。不稳定 Proposed API 只能在 Insiders/开发环境中显式启用，不能作为普通 Marketplace 扩展的依赖。
 
 开发工具覆盖脚手架、类型、Extension Development Host、单元/集成测试、Web 测试、VSIX 打包和发布。Workspace Trust 还要求分别测试 trusted/untrusted 状态。
 

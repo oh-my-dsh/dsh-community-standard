@@ -1,4 +1,4 @@
-# RFC 0003：服务 Provider 与确定性组合
+# RFC 0003: 服务 Provider 与确定性组合
 
 | 字段 | 内容 |
 | --- | --- |
@@ -69,7 +69,7 @@ Manifest 必须在结构和语义上分开以下声明：
 
 | 声明 | 回答的问题 | 权威与效果 |
 | --- | --- | --- |
-| `requires` | 哪些对象必须或可以已存在？ | 对命名 Host capability 或 service contract 的兼容依赖。缺少 required 项会阻止依赖者 activation；缺少 optional 项时进入已声明的降级路径。 |
+| `requires` | 哪些对象是必需的、哪些是可选的？ | 对命名 Host capability 或 service contract 的兼容依赖。缺少 required 项会阻止依赖者 activation；缺少 optional 项时进入已声明的降级路径。 |
 | `provides` | 这个插件能实现哪项 service contract？ | 只表示 Provider 候选资格。它不会授予权限、选择 Provider 或激活代码。 |
 | `contributes` | 这个插件向产品提供什么可发现对象？ | Command、panel 请求、renderer ID 或 setting 等静态元数据。Host 负责验证、位置、组合与呈现。 |
 | `permissions` | 插件请求用户或策略授予哪项敏感操作或数据 scope？ | 只表示授权请求。它既不证明 Host 支持，也不满足依赖。 |
@@ -176,7 +176,7 @@ Cardinality 具有 scope。Contract 必须说明 instance space 属于 runtime�
 | `host-only` | 只有 Host Descriptor 中公布的 Host/Adapter implementation 可以满足它。 | 任何插件 `provides` claim 都是 `hard-conflict`。 |
 | `host-or-plugin` | Host 与插件实现共同作为候选项，遵循相同版本、feature、scope、cardinality、选择和 provenance 规则。 | Host candidate 不能仅因为内置就获得隐式优先级。 |
 
-Provider eligibility 不会选择实现，也不授予 permission。对于 `host-or-plugin`，contract 仍必须提供明确的选择或合并规则；Host identity 只是 provenance，不是仲裁优先级。不表示可调用 Provider 的 contribution contract 则为自己的 resource kind 声明等价 ownership policy。
+Provider eligibility 不会选择实现，也不授予 permission。对于 `host-or-plugin`，contract 仍必须提供明确的选择或合并规则；Host identity 只是 provenance，不是仲裁优先级。对于不涉及可调用 Provider 的 contribution contract，则要为自己的 resource kind 声明等价的 ownership policy。
 
 ## 6. 静态组合结果
 
@@ -235,9 +235,9 @@ Host 不能根据安装或加载顺序发明默认项。已选 Provider 消失�
 
 Provider replacement 与 HMR 必须始终创建新的 activation identity，即使 plugin version 和 Provider ID 都没有变化。旧 activation identity 永远不能复用；它作为历史 provenance 保留，当前 binding 则指向新 owner。
 
-Activation 是 ownership boundary。如果一个 activation 拥有多个不可分离的 Provider 或 contribution，替换其中一项时，计划必须 transition 所有受影响资源与 dependent。需要独立 replacement 的 Provider 必须进入自己已声明的 child activation scope，不能事后脱离 owner。
+Activation 是 ownership boundary。如果一个 activation 拥有多个不可分离的 Provider 或 contribution，替换其中一项时，计划必须将所有受影响的资源与 dependent 一并完成状态迁移（transition）。需要独立 replacement 的 Provider 必须进入自己已声明的 child activation scope，不能事后脱离 owner。
 
-Consumer 只能通过生成的窄类型 handle 获得自己声明过的 dependency。Fabric 不暴露 `ctx.get(string)`、registry 枚举或原始 Provider object。Generation 或 Provider 被 dispose 后，handle 立即失效，并返回稳定的 `service-unavailable` 错误。
+Consumer 只能通过生成的窄类型 handle 获得自己声明过的 dependency。Fabric 不暴露 `ctx.get(string)`、registry 枚举或原始 Provider object。Generation 或 Provider 被 dispose 后，handle 立即失效，此后通过它的调用都返回稳定的 `service-unavailable` 错误。
 
 未来的开发体验可能类似下面这样，但名称和签名尚未冻结：
 
@@ -257,7 +257,7 @@ export default definePlugin((ctx) => {
 
 Disposal 必须有界且幂等。正常重组时，consumer 在 required Provider 之前停止；依赖边按反向拓扑顺序 dispose，activation 按拓扑顺序重新启动。Host 中止正在进行的调用、按 contract 规定的 drain window 等待、在 deadline 内等待 `Disposable` / `AsyncDisposable` 清理，然后强制移除 registry state 并记录清理失败。
 
-Consumer 不继承 Provider permission，Provider 也不继承 consumer permission。委托敏感权限需要另行规定、具有 scope 和过期时间的 delegation token，以及 audit record。`provides` 本身不授予任何权限。
+Consumer 不继承 Provider permission，Provider 也不继承 consumer permission。委托敏感权限需要单独规定：使用带 scope 和过期时间的 delegation token，并留下 audit record。`provides` 本身不授予任何权限。
 
 ## 9. Health、替换与 dependent reactivation
 
