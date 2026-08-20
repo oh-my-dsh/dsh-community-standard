@@ -50,6 +50,7 @@ const zhSidebar: DefaultTheme.SidebarItem[] = [
   {
     text: '指南',
     items: [
+      { text: '从零开始：Hello World', link: '/guides/hello-world' },
       { text: '插件作者', link: '/guides/plugin-author' },
       { text: '宿主维护者', link: '/guides/host-maintainer' },
       { text: '迁移指南', link: '/guides/migration' },

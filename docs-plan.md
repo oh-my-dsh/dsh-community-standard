@@ -45,6 +45,7 @@ dsh-community-standard/
 │   ├── fixtures/                  # 随 spec 产出
 │   └── suites/                    # Phase 2 实现期产出
 ├── guides/
+│   ├── hello-world.md             # P1
 │   ├── plugin-author.md           # P1
 │   ├── host-maintainer.md         # P1
 │   └── migration.md               # P2
@@ -166,6 +167,10 @@ Component → Facet → Activation → Participant 四级模型的规范定义�
 ## 5. guides/ —— 人话指南（非规范）
 
 规范可以严肃，指南必须说人话。每份开头声明"本文非规范，冲突以 spec/ 为准"。
+
+### guides/hello-world.md — P1
+
+从零开始的示例教程：一个 Hello World 插件的六次生长（斜杠命令 → 存储 → 消息观察 → optional 降级 → 本地校验 → UI 预览）。每步只加一个能力，演示"声明什么才能用什么"的完整玩法；UI 示例明确标注为 RFC 0002 范围的假想语法。
 
 ### guides/plugin-author.md — P1
 
