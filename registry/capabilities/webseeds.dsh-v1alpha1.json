@@ -1,0 +1,22 @@
+{
+  "$comment": "骨架占位（P0）。坐标与 schema id 均为示意，以 Registry 定案为准；schemaHash 待 schema 冻结后填入不可变 hash。条目字段定义见 registry/README.md。依据 RFC 0005，目标版本 v0.16。seedModules 为初始清单，各宿主实际提供的种子模块及版本以其 Host Descriptor 公示为准。",
+  "apiVersion": "webseeds.dsh/v1alpha1",
+  "kind": "SeedModules",
+  "status": "Draft",
+  "owningSpec": "spec/host-descriptor.md",
+  "owningRFC": "rfcs/0005-declarative-views.md",
+  "schema": {
+    "id": "https://dsh-std.example/schemas/webseeds.dsh/v1alpha1.json",
+    "hash": null
+  },
+  "sensitivity": "low",
+  "lifecycleScope": "component",
+  "deprecation": null,
+  "seedModules": [
+    "react",
+    "react/jsx-runtime",
+    "react-dom",
+    "react-dom/client",
+    "@deepseek-ai/cordis"
+  ]
+}

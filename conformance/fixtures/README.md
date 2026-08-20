@@ -28,3 +28,10 @@ fixtures/
 - **schema 表达不了的 manifest 规则**（由校验器 / suites 在 schema 校验之外断言，见 [spec/conformance.md](../../spec/conformance.md)）：
   - `manifest/invalid/duplicate-contributes-id.json`：`contributes.commands` 按 `id` 去重是跨元素语义，draft-07 无法表达——该文件能通过 schema，但必须被静态冲突检查拒绝。
   - `manifest/invalid/entry-outside-root.json`：`entry` 必须位于 package 根目录内是文件系统语义——该文件能通过 schema，但必须被路径校验拒绝。
+- **RFC 0005 视图/设置/主题贡献 fixtures**（manifest/，全部 schema 可校验）：
+  - `manifest/valid/views-theme.json`：含 `contributes.views`（list 型、keyed 型带 `key`、纯声明 `static` 各一）、`settings`、`themes` 的完整合法样本。
+  - `manifest/invalid/unknown-view-location.json`：`location` 写了枚举之外的 `sidebar.left`。
+  - `manifest/invalid/view-numeric-order.json`：view 条目带禁止的数字排序字段 `order`（被 `additionalProperties: false` 拒绝）。
+  - `manifest/invalid/view-keyed-missing-key.json`：`location: chat.node`（keyed 位置）但没有 `key`（被 if/then 拒绝）。
+  - `manifest/invalid/view-component-and-static.json`：`component` 与 `static` 同时出现（被 oneOf 拒绝）。
+  - `manifest/invalid/theme-unknown-token.json`：`themes[].tokens` 含不以 `--dsw-` 开头的键（被 propertyNames 拒绝）。

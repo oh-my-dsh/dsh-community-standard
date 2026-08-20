@@ -1,0 +1,63 @@
+{
+  "$schema": "https://dsh-std.example/schemas/dsh-plugin/v0.15.json",
+  "id": "com.example.views-demo",
+  "name": "Views Demo",
+  "version": "1.0.0",
+  "manifestVersion": "0.15",
+  "facets": {
+    "host": { "entry": "dist/host.js", "apiVersion": "v1alpha1" }
+  },
+  "requires": {
+    "contracts": [
+      { "apiVersion": "views.dsh/v1alpha1", "kind": "ViewContribution" },
+      { "apiVersion": "themes.dsh/v1alpha1", "kind": "Theme" }
+    ]
+  },
+  "permissions": [],
+  "contributes": {
+    "views": [
+      {
+        "id": "com.example.views-demo.sidebar",
+        "title": "Demo Sidebar",
+        "location": "sidebar.footer",
+        "priority": "normal",
+        "when": "root",
+        "component": "dist/views/sidebar.js"
+      },
+      {
+        "id": "com.example.views-demo.message-node",
+        "title": "Demo Message Node",
+        "location": "chat.node",
+        "when": "session",
+        "key": "demo-card",
+        "component": "dist/views/node.js"
+      },
+      {
+        "id": "com.example.views-demo.status",
+        "title": "Demo Status",
+        "location": "input.right",
+        "static": { "text": "demo ready" }
+      }
+    ],
+    "settings": [
+      {
+        "namespace": "com.example.views-demo",
+        "title": "Views Demo",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    ],
+    "themes": [
+      {
+        "id": "com.example.views-demo.dark",
+        "title": "Demo Dark",
+        "tokens": { "--dsw-bg": "#101418", "--dsw-fg": "#e6e6e6" },
+        "dark": { "--dsw-accent": "#7aa2f7" }
+      }
+    ]
+  }
+}

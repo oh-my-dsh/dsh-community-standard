@@ -36,7 +36,10 @@ dsh-community-standard/
 │   ├── lifecycle.md               # P0
 │   ├── event-envelope.md          # P0
 │   ├── facet-model.md             # P1
-│   └── conformance.md             # P1
+│   ├── conformance.md             # P1
+│   ├── facet-api.md               # 后规划期新增（草案）
+│   ├── views.md                   # 后规划期新增（RFC 0005）
+│   └── themes.md                  # 后规划期新增（RFC 0005）
 ├── registry/
 │   ├── README.md                  # P1
 │   ├── capabilities/              # P0（2 条目）

@@ -94,9 +94,135 @@
               "title": { "type": "string", "minLength": 1 }
             }
           }
+        },
+        "views": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "location"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$",
+                "description": "全局唯一，小写反向域名语法，应该以插件 id 为前缀。"
+              },
+              "title": { "type": "string", "minLength": 1 },
+              "location": {
+                "type": "string",
+                "enum": [
+                  "conversation.tab",
+                  "details.panel",
+                  "sidebar.footer",
+                  "settings.section",
+                  "settings.item",
+                  "input.left",
+                  "input.right",
+                  "composer.dock",
+                  "shell.overlay",
+                  "chat.commandview",
+                  "chat.node",
+                  "tool.view"
+                ],
+                "description": "视图位置，扁平字符串；插件不得声明此枚举之外的位置。"
+              },
+              "priority": {
+                "enum": ["high", "normal", "low"],
+                "default": "normal",
+                "description": "list 型位置的排布优先级；禁止数字 order 字段（additionalProperties: false 直接拒绝）。"
+              },
+              "when": {
+                "enum": ["root", "session"],
+                "description": "作用域：root（应用级）或 session（会话级）。"
+              },
+              "key": {
+                "type": "string",
+                "minLength": 1,
+                "description": "keyed 位置（chat.commandview / chat.node / tool.view）的分发键。"
+              },
+              "component": {
+                "type": "string",
+                "minLength": 1,
+                "description": "富组件 bundle，包内相对路径；与 static 二选一。"
+              },
+              "static": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["text"],
+                "properties": {
+                  "text": { "type": "string" }
+                },
+                "description": "纯声明视图内容（标题 + 静态文本）；与 component 二选一。"
+              }
+            },
+            "oneOf": [
+              { "required": ["component"] },
+              { "required": ["static"] }
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "location": { "enum": ["chat.commandview", "chat.node", "tool.view"] }
+                  },
+                  "required": ["location"]
+                },
+                "then": { "required": ["key"] }
+              }
+            ]
+          },
+          "description": "视图贡献（RFC 0005）：component 与 static 由 oneOf 强制二选一；keyed 位置缺 key 由 if/then 在 schema 层拒绝。"
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["namespace", "title", "schema"],
+            "properties": {
+              "namespace": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$",
+                "description": "设置命名空间，小写反向域名语法，应该以插件 id 为前缀。"
+              },
+              "title": { "type": "string", "minLength": 1 },
+              "schema": {
+                "type": "object",
+                "description": "内联 JSON Schema，驱动宿主渲染设置表单。"
+              }
+            }
+          },
+          "description": "设置贡献（RFC 0005）：schema 驱动的声明式设置项。"
+        },
+        "themes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "tokens"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "主题全局唯一 ID，应该以插件 id 为前缀。"
+              },
+              "title": { "type": "string", "minLength": 1 },
+              "tokens": {
+                "type": "object",
+                "propertyNames": { "pattern": "^--dsw-" },
+                "description": "设计令牌映射；键必须以 --dsw- 开头。"
+              },
+              "dark": {
+                "type": "object",
+                "propertyNames": { "pattern": "^--dsw-" },
+                "description": "深色模式令牌覆盖；键必须以 --dsw- 开头。"
+              }
+            }
+          },
+          "description": "主题贡献（RFC 0005）：只覆盖 --dsw-* 设计令牌，不承诺 DOM 钩子。"
         }
       },
-      "description": "v0.15 只定义 contributes.commands。"
+      "description": "v0.15 定稿 contributes.commands；views / settings / themes 随 RFC 0005 引入（目标 v0.16）。"
     },
     "subscriptions": {
       "type": "array",

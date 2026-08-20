@@ -33,7 +33,7 @@ capability 条目放 `capabilities/`，event 条目放 `events/`。文件主名 
 | `deprecation` | 弃用信息；未弃用为 `null`，弃用时记录替代坐标与弃用窗口（窗口规则见 [VERSIONING.md](../VERSIONING.md)） |
 | `$comment` | 给读者看的附注，无规范效力 |
 
-条目中未列出的字段一律视为不存在——不要假定有未写明的扩展字段。
+条目中未列出的**契约字段**一律视为不存在——不要假定有未写明的扩展字段。个别条目可以携带自身的数据清单（如 `themes` 的令牌表与钩子表、`webseeds` 的种子模块清单），这些数据字段在各条目的 md 正文里说明。
 
 ## 2. 坐标规则
 
@@ -64,6 +64,10 @@ capability 条目放 `capabilities/`，event 条目放 `events/`。文件主名 
 | [`commands.dsh/v1alpha1`](capabilities/commands.dsh-v1alpha1.md) | `Command` | capability | Draft |
 | [`storage.dsh/v1alpha1`](capabilities/storage.dsh-v1alpha1.md) | `LocalStorage` | capability | Draft |
 | [`messages.dsh/v1alpha1`](events/messages.dsh-v1alpha1.md) | `MessageObserver` | event | Draft |
+| [`views.dsh/v1alpha1`](capabilities/views.dsh-v1alpha1.md) | `ViewContribution` | capability | Draft |
+| [`themes.dsh/v1alpha1`](capabilities/themes.dsh-v1alpha1.md) | `Theme` | capability | Draft |
+| [`urlstate.dsh/v1alpha1`](capabilities/urlstate.dsh-v1alpha1.md) | `UrlState` | capability | Draft |
+| [`webseeds.dsh/v1alpha1`](capabilities/webseeds.dsh-v1alpha1.md) | `SeedModules` | capability | Draft |
 
 （坐标为示意，以本 Registry 定案为准。）
 
@@ -72,3 +76,4 @@ capability 条目放 `capabilities/`，event 条目放 `events/`。文件主名 
 | 日期 | 变更 |
 | --- | --- |
 | 2026-08-18 | 初稿：条目格式（对齐现有 JSON 字段）、坐标规则、登记流程指向、官方保留命名空间与 `x-org.*` 规则 |
+| 2026-08-20 | 新增四条 capability 条目（`views.dsh`、`themes.dsh`、`urlstate.dsh`、`webseeds.dsh` 的 `v1alpha1`），依据 RFC 0005，目标版本 v0.16 |

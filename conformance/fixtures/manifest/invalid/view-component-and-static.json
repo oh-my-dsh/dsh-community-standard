@@ -1,0 +1,21 @@
+{
+  "$schema": "https://dsh-std.example/schemas/dsh-plugin/v0.15.json",
+  "id": "com.example.both-payloads",
+  "name": "Both Payloads",
+  "version": "0.1.0",
+  "manifestVersion": "0.15",
+  "facets": {
+    "host": { "entry": "dist/host.js", "apiVersion": "v1alpha1" }
+  },
+  "contributes": {
+    "views": [
+      {
+        "id": "com.example.both-payloads.panel",
+        "title": "Ambiguous Panel",
+        "location": "details.panel",
+        "component": "dist/views/panel.js",
+        "static": { "text": "which one wins?" }
+      }
+    ]
+  }
+}

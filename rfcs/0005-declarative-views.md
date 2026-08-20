@@ -10,7 +10,7 @@
 | 标题 | 声明式视图贡献点 |
 | 状态 | Draft |
 | 目标版本 | v0.16 |
-| 范围 | 插件向宿主界面声明视图（对话 tab、右侧面板、侧边栏条目等）的 manifest 字段、组合规则、组件交付格式，以及命令子命令树；不管远端 Presentation 传输（那是 [RFC 0002](0002-runtime-presentation.md) 的事） |
+| 范围 | 插件向宿主界面声明视图、设置项与主题的 manifest 字段、组合规则、组件交付格式、命令子命令树、Web 端 urlState；不管远端 Presentation 传输与 TUI 投影（那是 [RFC 0002](0002-runtime-presentation.md) 的事） |
 | 依赖 | [RFC 0001](0001-core-contract.md)、[spec/manifest.md](../spec/manifest.md)、[spec/facet-api.md](../spec/facet-api.md)（草案）、调研证据见 [research/ui-layer-plan.md](../research/ui-layer-plan.md) |
 | 讨论方式 | [omdsh-dev/community](https://github.com/omdsh-dev/community) |
 
@@ -42,9 +42,9 @@ v0.15 刻意不做 UI：`client` / `worker` 是保留名，跨端声明式 UI �
 ## 非目标
 
 - **不做远端 Presentation 传输。** 视图声明随 manifest 走（静态 JSON 天然可传输），但"组件 bundle 要不要下发到远端客户端渲染"是 [RFC 0002](0002-runtime-presentation.md) 的范围。
+- **不做 TUI 投影与跨端组件模型。** 跨端 vnode、远端 Presentation 归 [RFC 0002](0002-runtime-presentation.md)（原路线图四期内容）。TUI 宿主按能力子集公示，缺的 location 协商时自然拒载或降级。
 - **不占用 `client` / `worker` 保留名。** 视图组件跑在宿主 Presentation 进程内，信任档位与 v0.15 一致（trusted-in-process，不承诺沙箱）。
 - **不发明新的 UI 组件模型。** 不引入自研 vnode、自研渲染层（那条路的评估见"被拒绝的替代方案"）。
-- **一期不做主题/皮肤契约**（设计令牌注册表、DOM 钩子承诺），不做 keyed 渲染器（消息节点、工具视图），不做 TUI 投影。分期见设计 §7。
 - **不做包管理与分发。**
 
 ## 设计
@@ -79,7 +79,7 @@ v0.15 刻意不做 UI：`client` / `worker` 是保留名，跨端声明式 UI �
 
 ### 2. location 目录：贡献点进 registry
 
-视图位置（location）是标准契约：插件不得声明 registry 里不存在的位置，宿主不得自造未登记的位置名。location 用扁平字符串（`conversation.tab`），但它的枚举和语义由 `views.dsh/v1alpha1` 的 registry 条目定义，随条目版本演进。契约坐标留给"能力"，位置名是能力的领域语义，两套命名法只背一套。新增 location 走 registry 条目修订，不改 manifest 格式。一期只收三个（按插件被迫 patch 的严重程度排序）：
+视图位置（location）是标准契约：插件不得声明 registry 里不存在的位置，宿主不得自造未登记的位置名。location 用扁平字符串（`conversation.tab`），但它的枚举和语义由 `views.dsh/v1alpha1` 的 registry 条目定义，随条目版本演进。契约坐标留给"能力"，位置名是能力的领域语义，两套命名法只背一套。新增 location 走 registry 条目修订，不改 manifest 格式。v1alpha1 的完整目录（12 个位置）以 registry 条目和 [spec/views.md](../spec/views.md) 为准，其中证据最硬的三个：
 
 | location | 语义 | 基数 | 证据 |
 | --- | --- | --- | --- |
@@ -87,7 +87,7 @@ v0.15 刻意不做 UI：`client` / `worker` 是保留名，跨端声明式 UI �
 | `details.panel` | 右侧详情面板 | list | 两个插件各自手工 patch 宿主补出 |
 | `sidebar.footer` | 左侧边栏底部条目 | list | 社区插件靠 MutationObserver 注入 DOM |
 
-后续期次的候选位置（设置页、输入区小件、浮层挂件、消息节点渲染器等）已在调研稿里列出，每期进 registry 前走各自的评审。
+其余九个（设置页、输入区小件、浮层挂件、keyed 渲染器等）的取舍证据见 [research/ui-layer-plan.md](../research/ui-layer-plan.md)。
 
 ### 3. SDK 抽象层：官方变，插件不炸
 
@@ -115,7 +115,7 @@ v0.15 刻意不做 UI：`client` / `worker` 是保留名，跨端声明式 UI �
 - **list（多个共存）**：按 `priority` 排列，取值 `high | normal | low`，同优先级按 manifest 声明顺序。**禁止数字 order**——现状是插件硬编码 20/30/40 并在注释里互相引用对方的数字，这是隐式耦合，两个互不相识的插件无法对齐。
 - **keyed（按键分发）**：同 key 冲突在安装前静态检出，报告给市场/启动器。
 - **single（独占）**：宿主保留，插件不可贡献（对应 Qiuner 在社区讨论里提的 `shell.root: shell owned only`）。
-- **chain（接管链）**：一期不开放。
+- **chain（接管链）**：本版不开放。
 
 ### 5. 组件交付格式：把事实标准写成契约
 
@@ -131,16 +131,16 @@ v0.15 刻意不做 UI：`client` / `worker` 是保留名，跨端声明式 UI �
 
 命令描述符增加可选的 `subcommands` 递归结构（名称、描述、输入提示），随命令目录一起下发。改动小，补上 issue #23 确认的协议缺口：远端客户端从此能看到完整的命令层级，不再只有根命令。
 
-### 7. 分期路线图
+### 7. 落地范围（原分期路线图已合并）
 
-| 期 | 内容 |
-| --- | --- |
-| **一期（本 RFC，v0.16）** | `contributes.views` + 三个 location + 组合规则 + 组件交付契约 + SDK 抽象层义务 + 命令子命令树 |
-| 二期 | 设置项贡献（schema 驱动表单）、keyed 渲染器（命令视图、消息节点、工具视图）、输入区小件 |
-| 三期 | 主题契约（`--dsw-*` 令牌注册表 + 稳定 DOM 钩子承诺 + 互斥规则）、浮层挂件、Web 端 urlState 状态持久化（字段白名单、不存 secret，见 issue #24 讨论） |
-| 四期 | 与 RFC 0002 合流：跨端组件模型、TUI 投影、远端 Presentation |
+本 RFC 最初按四期规划；经评估，一至三期的设计证据已经齐备，**合并为一次落地**（2026-08-20 修订）：
 
-每期都有独立的 registry 条目、schema 和 fixtures；后一期展开时如发现一期的设计要修，走勘误 RFC，不回改本文件。
+- `contributes.views` + 12 个 location 全量目录 + 组合规则 + 组件交付契约 + SDK 抽象层义务 + 命令子命令树（原一期）
+- 设置项贡献（schema 驱动表单）、keyed 渲染器（命令视图、消息节点、工具视图）、输入区小件（原二期）
+- 主题契约（`--dsw-*` 令牌注册表 + 稳定 DOM 钩子承诺 + 互斥规则）、浮层挂件、Web 端 urlState 状态持久化（字段白名单、不存 secret，见 issue #24 讨论）（原三期）
+- **仍留待后续**：与 RFC 0002 合流——跨端组件模型、TUI 投影、远端 Presentation（原四期，依赖 0002 定稿）
+
+规范本体落在 [spec/views.md](../spec/views.md) 与 [spec/themes.md](../spec/themes.md)；registry 条目、schema 与 fixtures 随本 RFC 一并交付。后续如发现设计要修，走勘误 RFC，不回改本文件。
 
 ## 被拒绝的替代方案
 
@@ -154,13 +154,14 @@ v0.15 刻意不做 UI：`client` / `worker` 是保留名，跨端声明式 UI �
 
 1. **location 坐标形态 → 扁平字符串，枚举由 registry 条目定义。** 契约坐标（`apiVersion + kind`）只用于"能力"本身；位置名是能力的领域语义，跟着条目版本走。插件作者只背一套命名法（已按此写入 §2）。
 2. **priority 三档够用，不做 before/after。** before/after 要按 id 指名别的插件，那是插件间的具名耦合——比数字 order 更糟，至少数字还能撞得随机。真有排布诉求，等出现两个抢位置的插件再走勘误 RFC 加。
-3. **纯声明视图只做标题 + 静态文本。** 支持 Markdown 就得连渲染器和消毒契约一起定，一期范围爆炸；Hello World 和状态展示用纯文本足够（已按此写入 §5）。
+3. **纯声明视图只做标题 + 静态文本。** 支持 Markdown 就得连渲染器和消毒契约一起定，范围爆炸；Hello World 和状态展示用纯文本足够（已按此写入 §5）。
 4. **命令子命令树并入本 RFC。** 改动是一个可选递归字段，单独走一份 RFC 只增加流程开销，不产生额外评审价值（已按此保留 §6）。
 5. **种子模块清单独立成 registry 条目，单独版本化。** 它跟着官方宿主的发布节奏跑；锁进 spec 版本意味着宿主每升级一次种子就要等一次 spec 发版（已按此写入 §5）。
-6. **主题契约：补槽优先、注册表兜底。** 三期展开时先盘点现有 DOM 注入需求里有多少能被新 location 直接消灭；剩下消灭不掉的（如 composer 区域样式），再把对应钩子建注册表并配弃用政策。不为还没出现的需求提前承诺 DOM 结构。
+6. **主题契约：补槽优先、注册表兜底。** 先盘点现有 DOM 注入需求里有多少能被 location 直接消灭；剩下消灭不掉的（如 composer 区域样式），再把对应钩子建注册表并配弃用政策。不为还没出现的需求提前承诺 DOM 结构。
 
 ## 变更记录
 
 | 日期 | 变更 |
 | --- | --- |
 | 2026-08-20 | 初稿（依据 [research/ui-layer-plan.md](../research/ui-layer-plan.md) 的实证调研） |
+| 2026-08-20 | 原一至三期合并为一次落地：location 目录扩至 12 个，设置项、主题契约、urlState 并入范围；规范本体落 spec/views.md 与 spec/themes.md |

@@ -1,0 +1,44 @@
+{
+  "$comment": "骨架占位（P0）。坐标与 schema id 均为示意，以 Registry 定案为准；schemaHash 待 schema 冻结后填入不可变 hash。条目字段定义见 registry/README.md。依据 RFC 0005，目标版本 v0.16。相比 commands 条目，本条额外携带 designTokens 与 domHooks 两个数据字段——令牌表与钩子表本身就是契约内容。",
+  "apiVersion": "themes.dsh/v1alpha1",
+  "kind": "Theme",
+  "status": "Draft",
+  "owningSpec": "spec/manifest.md",
+  "owningRFC": "rfcs/0005-declarative-views.md",
+  "schema": {
+    "id": "https://dsh-std.example/schemas/themes.dsh/v1alpha1.json",
+    "hash": null
+  },
+  "sensitivity": "low",
+  "lifecycleScope": "component",
+  "deprecation": null,
+  "designTokens": {
+    "$comment": "初始集，随条目版本演进；令牌名为示意，以 Registry 定案为准。新增令牌走本条目修订。",
+    "static": [
+      "--dsw-static-gray-50",
+      "--dsw-static-gray-100",
+      "--dsw-static-gray-500",
+      "--dsw-static-gray-900",
+      "--dsw-static-blue-500",
+      "--dsw-static-red-500"
+    ],
+    "alias": [
+      "--dsw-alias-bg-primary",
+      "--dsw-alias-bg-secondary",
+      "--dsw-alias-text-primary",
+      "--dsw-alias-text-secondary",
+      "--dsw-alias-border",
+      "--dsw-alias-accent",
+      "--dsw-alias-danger",
+      "--dsw-alias-composer-bg"
+    ]
+  },
+  "domHooks": [
+    "data-pane",
+    "data-composer-seat",
+    "data-composer-card",
+    "data-conversation-scroll",
+    "data-chat-flow-kind",
+    "data-dsh-frame"
+  ]
+}

@@ -2,7 +2,7 @@
 
 > **状态：Draft v0.15（社区讨论稿，非官方标准）｜ 本文非规范，与 spec/ 冲突时以 spec/ 为准**
 >
-> 本文用一个插件的六次生长，演示这套标准怎么声明、怎么开发。每一步只加一个能力，每步的插件都是完整可跑的。代码中的 SDK 形态为示意，以 [spec/facet-api.md](../spec/facet-api.md) 定稿为准。
+> 本文用一个插件的八次生长，演示这套标准怎么声明、怎么开发。每一步只加一个能力，每步的插件都是完整可跑的。代码中的 SDK 形态为示意，以 [spec/facet-api.md](../spec/facet-api.md) 定稿为准。
 
 我们要做的插件叫 `com.example.hello-dsh`。它将依次学会：
 
@@ -11,7 +11,9 @@
 3. 听到新消息时打声招呼；
 4. 宿主没有消息能力时照样能活；
 5. 装上宿主之前，先跑一遍本地校验；
-6. 把 Hello World 放进侧边栏、对话 tab 和右侧面板。
+6. 把 Hello World 放进侧边栏、对话 tab 和右侧面板；
+7. 让打招呼文案和计数起点变成用户可配置的；
+8. 给自己换个皮肤，染成主题色。
 
 整个插件的核心自始至终只有**两个文件**：一份声明（`dsh-plugin.json`），一份代码（`host.ts`）；第六步会多出一个可选的视图组件文件。声明告诉宿主"我要什么"，代码只在协商通过后拿到声明过的能力——这就是这套标准的全部玩法。
 
@@ -213,9 +215,103 @@ export default function HelloView() {
 - **排布写 `priority`（`high | normal | low`），不写数字。** 你的插件不需要知道别的插件存在，宿主按优先级类别排。
 - **摆成什么样是宿主的事。** 同一个 `conversation.tab`，Web 宿主渲染成页签，TUI 宿主可能渲染成切换面板——插件不关心，也不能关心。
 
+## 第七步：让用户能配置（设置项）
+
+第六步开头那句"方向已定稿、宿主实现还在跟进"，从这里起每步都适用，不再重复。
+
+到目前为止，打招呼文案和计数起点都写死在代码里。想让用户自己改，玩法还是一样：在 manifest 里声明，不写设置 UI——
+
+```jsonc
+// 字段布局为示意，以 spec 定稿为准
+"contributes": {
+  "settings": {
+    "namespace": "com.example.hello-dsh",   // 反向域名，设置按 namespace 隔离
+    "title": "Hello World",
+    "schema": {                              // 内联 JSON Schema
+      "type": "object",
+      "properties": {
+        "greeting": { "type": "string", "title": "打招呼文案", "default": "Hello World" },
+        "startAt": { "type": "integer", "title": "计数起点", "default": 0, "minimum": 0 }
+      }
+    }
+  }
+}
+```
+
+就这些。`schema` 一声明，宿主照着 JSON Schema 自动生成设置表单——标题、输入框、默认值、校验全包，**插件一行表单代码都不用写**。这和纯声明视图是同一个道理，也和你第一步就见过的那条规则是同一哲学：声明什么，才能用什么。
+
+两个细节：
+
+- **不用再声明新契约。** 设置项搭的是第六步 `views.dsh/v1alpha1` 的车——表单本质是宿主设置页里的一节视图，落在 `settings.section` 这个登记过的 location 上。
+- **设置按 namespace 隔离。** 代码里经 settings 句柄读写，只摸得到自己 namespace 下的键，别人家的设置碰不到——和存储的私有性同一条纪律。
+
+代码里把写死的值换成读设置（句柄形态示意，以 spec 定稿为准）：
+
+```ts
+export default defineFacet((activation) => {
+  const storage = activation.contracts.get(
+    { apiVersion: 'storage.dsh/v1alpha1', kind: 'LocalStorage' }
+  )
+  const views = activation.contracts.get(
+    { apiVersion: 'views.dsh/v1alpha1', kind: 'ViewContribution' }
+  )
+
+  activation.extensions.publish(
+    { apiVersion: 'commands.dsh/v1alpha1', kind: 'Command' },
+    'com.example.hello-dsh.say-hello',
+    async () => {
+      const greeting = ((await views.settings.get('greeting')) as string | undefined) ?? 'Hello World'
+      const startAt = ((await views.settings.get('startAt')) as number | undefined) ?? 0
+      const count = ((await storage.get('count')) as number | undefined) ?? startAt
+      await storage.set('count', count + 1)
+      activation.log.info(`${greeting}！这是第 ${count + 1} 次`)
+    }
+  )
+})
+```
+
+用户在设置页改了文案，下一次 `/hello` 就是新的话——你的代码只多了一扇领取设置的窗口，其余一行没变。
+
+## 第八步：给它换个皮肤（主题）
+
+最后一步，一行代码都不用改，只动 manifest。这个插件顺带贡献一个皮肤，把界面染成自己的主题色：
+
+```jsonc
+// 字段布局为示意，以 spec 定稿为准
+"requires": {
+  "contracts": [
+    // ……前几步的契约照旧
+    { "apiVersion": "themes.dsh/v1alpha1", "kind": "Theme", "optional": true }
+  ]
+},
+"contributes": {
+  "themes": [
+    {
+      "id": "com.example.hello-dsh.mint",
+      "title": "Hello Mint",
+      "tokens": {
+        "--dsw-alias-accent": "#3ec98f",
+        "--dsw-alias-bg-primary": "#f0faf5",
+        "--dsw-alias-text-primary": "#12372a"
+      },
+      "dark": {                                   // 暗色覆盖，可选
+        "--dsw-alias-bg-primary": "#0f2b21",
+        "--dsw-alias-text-primary": "#d9f5e8"
+      }
+    }
+  ]
+}
+```
+
+三条规则，听完你会觉得耳熟：
+
+- **`tokens` 的键只能来自 registry 令牌表里的 `--dsw-*` 令牌。** 自造一个 `--hello-green`，第五步那个校验工具当场就报出来——和"location 只能写登记过的位置"是同一条纪律。
+- **宿主同时只激活一个皮肤主题。** 用户启用你的 Hello Mint，别的皮肤就退场，不叠加、不打架；`dark` 里的覆盖只在暗色模式下生效。
+- **卸载即还原。** 令牌值随主题来去，卸载或一切换，界面立刻回到原样——没有残留 patch，没有 MutationObserver，没有给零承诺钩子写的自愈代码。皮肤插件当年那些野路子，到此为止。
+
 ## 回头看一眼
 
-六步走完，这个插件碰过的所有东西：一份静态 JSON、一个 `defineFacet`、三面上下文（`extensions` / `contracts` / `scope`）、四条 registry 契约。没有 patch，没有反射探测，没有宿主内部函数。这就是为什么它能穿越 dsh 上游的更新周期——它依赖的是契约，不是实现；官方改内部 UI，变化由 SDK 适配层吸收，插件零感知。
+八步走完，这个插件碰过的所有东西：一份静态 JSON、一个 `defineFacet`、三面上下文（`extensions` / `contracts` / `scope`）、五条 registry 契约（commands、storage、messages、views、themes——设置项搭 views 契约的车，不新增坐标）。没有 patch，没有反射探测，没有宿主内部函数。这就是为什么它能穿越 dsh 上游的更新周期——它依赖的是契约，不是实现；官方改内部 UI，变化由 SDK 适配层吸收，插件零感知。
 
 想写真正的插件，接着读[插件作者指南](plugin-author.md)；从 patch 流派迁移过来的，直接读[迁移指南](migration.md)。
 
@@ -223,6 +319,8 @@ export default function HelloView() {
 
 - [spec/facet-api.md](../spec/facet-api.md) —— `defineFacet` 与三面上下文的逐条签名（草案）
 - [spec/manifest.md](../spec/manifest.md) —— manifest 逐字段权威定义
-- [registry/](../registry/README.md) —— 三条契约坐标的机器可读条目
+- [spec/views.md](../spec/views.md) —— `contributes.views` 与设置贡献点（草案）
+- [spec/themes.md](../spec/themes.md) —— `contributes.themes` 与 `--dsw-*` 令牌表（草案）
+- [registry/](../registry/README.md) —— 契约坐标的机器可读条目
 - [插件作者指南](plugin-author.md) —— 声明/绑定纪律、协商报告与报错对照
-- [RFC 0005](../rfcs/0005-declarative-views.md) —— 第六步视图贡献点的标准本体（含分期路线图）
+- [RFC 0005](../rfcs/0005-declarative-views.md) —— 第六到八步视图、设置、主题贡献点的标准本体
