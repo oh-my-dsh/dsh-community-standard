@@ -34,6 +34,7 @@ const zhSidebar: DefaultTheme.SidebarItem[] = [
       { text: '生命周期', link: '/spec/lifecycle' },
       { text: '事件信封', link: '/spec/event-envelope' },
       { text: 'Facet 对象模型', link: '/spec/facet-model' },
+      { text: 'Facet API 参考', link: '/spec/facet-api' },
       { text: '一致性', link: '/spec/conformance' },
     ],
   },
@@ -163,7 +164,7 @@ export default defineConfig({
   lastUpdated: true,
   // 文档已全部成稿：死链直接让构建失败
   ignoreDeadLinks: false,
-  srcExclude: ['.github/**', '.vitepress/**', 'node_modules/**'],
+  srcExclude: ['.github/**', '.vitepress/**', 'node_modules/**', 'fable-file/**'],
 
   // 让各目录的 README.md 成为该目录的首页（中英文树都适用）
   rewrites: {

@@ -2,9 +2,11 @@
 
 > **状态：Draft v0.15（社区讨论稿，非官方标准）**
 > 产出物：[`schemas/negotiation-report.schema.json`](../schemas/negotiation-report.schema.json)
-> 读者提示：这份 spec 一半写给实现协商器的宿主开发者，一半写给在 CI 里消费协商报告的工具作者；§4 给全三种结局的完整示例。
+> 读者提示：这份 spec 一半写给实现协商器的宿主开发者，一半写给在 CI 里消费协商报告的工具作者。[§4](#4-三种结局的完整示例) 给全三种结局的完整示例。每条"必须"对应的测试样本统一列在 [§5](#5-错误与边界情况) 和 [§6](#6-对应-fixtures-清单)。
 
-这份文件定义"协商"这件事：拿一份插件 manifest 和一份宿主自述（Host Descriptor），**不运行任何插件代码**，静态算出"能不能装、能不能跑、要不要先问用户"，并产出一份机器可读报告。它是领域无关的纯函数，不依赖 dsh 就能测试。
+"协商"回答的是这样一个问题：手里有一份插件 manifest 和一份宿主自述（Host Descriptor），**不运行任何插件代码**，能不能算出"能装吗、能跑吗、要不要先问用户"？
+
+答案是能，而且必须能——这就是协商内核。它是一个纯函数：同样的输入永远给同样的答案，没有网络、没有时钟、没有随机数，你可以在 CI 里跑一万次，结果逐字节相同。这个性质不是洁癖，它意味着市场、启动器、CI 和宿主看到的兼容性判断**永远一致**，不存在"我这儿能装你那儿装不上"的玄学。
 
 ## 1. 适用范围
 
@@ -25,25 +27,27 @@ negotiate(manifest, hostDescriptor, registrySnapshot) → report
 
 协商**必须**是纯函数：
 
-- 无 I/O、无网络访问、不读时钟与随机源；相同输入**必须**产生相同报告；
-- 不得 import dsh / Cordis / 任何宿主产品代码——CI 里不装 dsh 也必须能跑；
-- `registrySnapshot` 是 [registry/](../registry/README.md) 条目的冻结快照，作为输入传入（v0.15 即三条标准条目）；协商器不得自行从规范正文发明条目。
+- 无 I/O、无网络访问、不读时钟与随机源。相同输入**必须**产生相同报告。
+- 不得 import dsh / Cordis / 任何宿主产品代码——CI 里不装 dsh 也必须能跑。
+- `registrySnapshot` 是 [registry/](../registry/README.md) 条目的冻结快照，作为输入传入（v0.15 即三条标准条目）。协商器不得自行从规范正文发明条目。
 
-内核只做三件事：解析参与者声明、解析 `apiVersion + kind` 契约引用、做 requires/supports 匹配。
+内核只做三件事：解析参与者声明、解析 `apiVersion + kind` 契约引用、做 requires/supports 匹配。它不认识 storage、commands、messages——具体领域的语义全在各契约条目里，这正是"元协议"的意思：内核只认门牌号格式，不管门里住着谁。
 
 ### 2.2 前置条件
 
-进入协商前，manifest 与 Host Descriptor **必须**已分别通过各自的 schema 校验（即生命周期 `validate` 阶段已通过，见 [lifecycle.md](lifecycle.md)）。协商器对非法输入的行为不作规定——工具应当在调用协商前先校验。
+进入协商前，manifest 与 Host Descriptor **必须**已分别通过各自的 schema 校验（即生命周期 `validate` 阶段已通过，见 [lifecycle.md](lifecycle.md)）。协商器对非法输入的行为不作规定——工具应当在调用协商前先校验，垃圾进垃圾出不是协商器的责任范围。
 
 ### 2.3 匹配规则
 
 按顺序执行三类检查：
 
-1. **Facet 检查**：对 manifest `facets` 中每个 facet，其 `apiVersion` **必须**出现在 Descriptor `apiVersions[facet]` 数组中；不满足的记入 `unsupportedFacets`。
-2. **契约检查**：对 `requires.contracts` 每项，在 Descriptor `capabilities` 中找 `apiVersion` 与 `kind` **双双精确相等**的条目（坐标规则见 [VERSIONING.md](../VERSIONING.md)）。required 契约无匹配 → 记入 `missingRequired`；optional 契约无匹配 → 记入 `degradedOptional`。
-3. **敏感检查**：对所有**匹配成功**的声明（含 `subscriptions` 引用的事件），查 registry 快照的敏感级别；标记为需授权的记入 `awaitingAuthorization`。optional 且缺失的声明不进入此项——缺失即降级，无需授权。
+1. **Facet 检查**：对 manifest `facets` 中每个 facet，其 `apiVersion` **必须**出现在 Descriptor `apiVersions[facet]` 数组中。不满足的记入 `unsupportedFacets`。
+2. **契约检查**：对 `requires.contracts` 每项，在 Descriptor `capabilities` 中找 `apiVersion` 与 `kind` **双双精确相等**的条目。没有模糊匹配、没有"差不多兼容"。required 契约无匹配 → 记入 `missingRequired`；optional 契约无匹配 → 记入 `degradedOptional`。
+3. **敏感检查**：对所有**匹配成功**的声明（含 `subscriptions` 引用的事件），查 registry 快照的敏感级别；标记为需授权的记入 `awaitingAuthorization`。注意 optional 且缺失的声明不进入此项——缺失即降级，人都不在，不需要授权。
 
 ### 2.4 判定规则
+
+三种结局，不多不少：
 
 | verdict | 条件 | 含义 |
 | --- | --- | --- |
@@ -51,10 +55,13 @@ negotiate(manifest, hostDescriptor, registrySnapshot) → report
 | `pending-authorization` | 无拒绝项，且 `awaitingAuthorization` 非空 | 宿主支持，但需用户或策略授权后才能激活 |
 | `compatible` | 以上都不是 | 静态协商通过（`degradedOptional` 可能非空） |
 
-- **required 缺失 → 拒载**，且报告**必须**携带用户能看懂的人话原因：说明插件需要什么、当前环境缺什么。示例样式："该插件需要图形界面能力，当前终端不支持"。只输出坐标串、没有人话解释的报告不合规。fixture：`conformance/fixtures/negotiation/rejected-missing-required/expected-report.json`。
-- **optional 缺失 → 降级**：verdict 仍为 `compatible`，缺失项列入 `degradedOptional`，插件按声明过的降级路径运行（语义见 [manifest.md §3.7](manifest.md)）。fixture：`conformance/fixtures/negotiation/degraded-optional/expected-report.json`。
-- **待授权不是拒绝**：`pending-authorization` 表示"授权即可用"；授权流程本身（何时问、如何记）是宿主 `authorize` 阶段的职责（见 [lifecycle.md](lifecycle.md)），不属于本纯函数。
-- 报告到市场五态的映射规则（声明兼容 / 等待授权 / 已实测 / 不兼容 / 未知，且不得互相升级）见 [host-descriptor.md §3](host-descriptor.md)，本文不复述。
+三条补充规则：
+
+- **拒载必须说人话。** required 缺失时，报告**必须**携带用户能看懂的原因：插件需要什么、当前环境缺什么。示例样式："该插件需要图形界面能力，当前终端不支持"。只输出坐标串、没有人话解释的报告不合规——被拒载的是用户，不是解析器。
+- **optional 缺失是降级，不是失败。** verdict 仍为 `compatible`，缺失项列入 `degradedOptional`，插件按声明过的降级路径运行（语义见 [manifest.md §3.7](manifest.md)）。
+- **待授权不是拒绝。** `pending-authorization` 的意思是"授权即可用"。授权流程本身（什么时候问用户、答案记在哪）是宿主 `authorize` 阶段的职责（见 [lifecycle.md](lifecycle.md)），不属于这个纯函数——纯函数不弹对话框。
+
+报告到市场五态的映射规则（声明兼容 / 等待授权 / 已实测 / 不兼容 / 未知，且不得互相升级）见 [host-descriptor.md §3](host-descriptor.md)，本文不复述。
 
 ### 2.5 协商报告格式
 
@@ -70,7 +77,7 @@ negotiate(manifest, hostDescriptor, registrySnapshot) → report
 | `awaitingAuthorization` | array | 否 | 待授权的敏感声明坐标 |
 | `unsupportedFacets` | array | 否 | facet API 版本不匹配项（`{ facet, requiredApiVersion, supportedApiVersions }`） |
 
-宿主、市场、启动器、CI **必须**消费同一份报告格式——社区此前的插件校验报告（qing3a / dsh-plugin-verify 的格式诉求）已并入本格式，不再单独存在（背景见 [decisions/round-1](../decisions/round-1-issue-23.md)）。
+宿主、市场、启动器、CI **必须**消费同一份报告格式。社区此前独立存在的插件校验报告（qing3a / dsh-plugin-verify 的格式诉求）已并入本格式，不再单独存在（背景见 [decisions/round-1](../decisions/round-1-issue-23.md)）。
 
 ## 3. 示例输入
 
