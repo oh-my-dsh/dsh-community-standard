@@ -28,7 +28,8 @@ dsh-community-standard/
 │   ├── 0002-runtime-presentation.md   # P2（迁移）
 │   ├── 0003-service-composition.md    # P2（迁移）
 │   ├── 0004-provenance-diagnostics.md # P2（迁移）
-│   └── 0005-declarative-views.md  # 后规划期新增（2026-08-20 初稿）
+│   ├── 0005-declarative-views.md  # 后规划期新增（2026-08-20 初稿）
+│   └── 0006-host-services.md      # 后规划期新增（2026-08-20 初稿，宿主服务能力族）
 ├── spec/
 │   ├── manifest.md                # P0
 │   ├── host-descriptor.md         # P0
@@ -215,6 +216,27 @@ Component → Facet → Activation → Participant 四级模型的规范定义�
 1. **规范只写一遍**：同一条规则出现在两个文件里，第二处必须是链接。
 2. **"必须"必有 fixture**：写下一条"必须"之前，先想好违反它的 fixture 长什么样。
 3. **示意值标示意**：所有未定案的 URL、坐标、字段名，统一加"（示意，以 Registry 定案为准）"，避免占位符被当成决定传播出去——`dsh-std.example` 这种占位 URL 已经在外面流传了一次。
+
+---
+
+## 8. 后规划期：真实插件审计与缺口清单（2026-08-20）
+
+规划期结束后做了一次对照审计：把 9 个真实插件项目（tavern、web-ui 全家桶、travel、activity、neoforge、galgame-skin、live-stats、remote-web-ui、git-graph 等）的实现方式逐条拆开，对照现有文档看"照标准能不能写出来"。结论：**框架底座与 UI 层够用，宿主侧服务能力是空白**——越全栈的插件越在 hack。
+
+| 缺口 | 谁在被迫 hack | 处置 |
+| --- | --- | --- |
+| 宿主服务能力族：HTTP 路由、宿主内 LLM 调用、systemPrompt 分段注入 | tavern（重度）、git-graph、aionui-panel、remote-web-ui | **RFC 0006** |
+| 宿主侧后台任务与定时调度 | tavern 裸 `setInterval`；task-board 在浏览器标签页里跑 cron，关页即错过 | **RFC 0006** |
+| 事件订阅过滤与增量同步 | activity 冷启动全量下载 157MB（99.4% 是 chunk 洪流），自建 digest 绕过 | **RFC 0006** |
+| 插件私有文件目录与原子写 | tavern / travel / pet 三家三种写法，home 解析各抄一份 | **RFC 0006** |
+| 侧边栏入口、中间列替换等 location | task-board 被逼 DOM 注入 + MutationObserver 自愈 | 后续 RFC（views 增补） |
+| 皮肤系统：布局级重排、稳定 data 属性契约、试穿与互斥 | galgame-skin 靠 DOM 约定 + 外部脚本 | 后续 RFC（themes 增补） |
+| 会话投影注册（插件注、第一方 UI 读） | live-stats 已验证该协作路径 | 后续 RFC |
+| 运行期补丁治理（mixin 快照/恢复/冲突/降级） | neoforge 已造出完整语义 | 后续 RFC（先表态：禁止/收容/规范） |
+| Node↔浏览器事件通道 | neoforge 只能轮询 relay | RFC 0002 合流时再议 |
+| 发现层元数据（catalog、分类、风险标记） | dshfind、members-export 各自按自己口径识别插件 | 后续 RFC |
+
+写作顺序即上表顺序：RFC 0006 先吸收前四行（它们共享同一个论证——**安全原语和样板代码应该下沉到宿主，而不是每个插件重造一遍**），其余缺口各自成 RFC，不在 0006 里摊大。
 
 ---
 

@@ -25,6 +25,7 @@ const zhSidebar: DefaultTheme.SidebarItem[] = [
       { text: '0003 Service 组合', link: '/rfcs/0003-service-composition' },
       { text: '0004 溯源与诊断', link: '/rfcs/0004-provenance-diagnostics' },
       { text: '0005 声明式视图贡献点', link: '/rfcs/0005-declarative-views' },
+      { text: '0006 宿主服务能力族', link: '/rfcs/0006-host-services' },
     ],
   },
   {
